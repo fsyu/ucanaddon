@@ -1,0 +1,819 @@
+<?php 
+	$getstuid= $_GET["getstuid"];
+	$admintype= $_GET["admintype"]; 
+	if($admintype==null){$admintype=0;}
+?>
+<!-- CSS file -->
+<link rel="stylesheet" href="/ccawww/public/css/easy-autocomplete.css"> 
+<!-- Additional CSS Themes file - not required-->
+<link rel="stylesheet" href="/ccawww/public/css/easy-autocomplete.themes.css"> 
+<style>
+.container{
+	width: 90%;
+}
+body{
+	font-size:16px;
+}
+.twitter-typeahead{
+	width:100%;
+}
+.easy-autocomplete{
+	width:100%;
+}
+.modal-center {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal-center:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-center .modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+</style>
+<div class="container-fluid">
+	<div class="row">
+		<form id='searchform' role="form" class="form-inline" method='GET' onsubmit="return validateForm()"
+	action="<?php echo $this->baseUrl('power/admin/adminbasis'); ?>"  style="text-align:center;">
+			<div id='search1' style="padding:80px 100px 40px 100px;">
+				<span style="font-size:20px;">請輸入同學之資料:</span>
+				<input id='searchvalue' name='searchvalue' style="width:30%;margin:0px 10px 0px 10px;font-size:20px;" class=' form-control' placeholder="學號/KSUID/班級" value="<?php if($this->searchvalue!=null){ echo $this->searchvalue;}?>" />
+				<button type="submit" class="btn btn-primary" >搜尋</button>
+			</div>
+		</form>
+		<hr/>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					資料列表
+				</h3>
+			</div>
+			<div class="panel-body">
+				<?php if($this->studata!=null){ ?>
+				<div class="col-md-12">
+					<table class="table table-condensed table-hover datatable stutable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>部別</th>
+								<th>系所</th>
+								<th>班級</th>
+								<th>KSUID</th>
+								<th>學號</th>
+								<th>姓名</th>
+								<th>英文姓名</th>
+								<th>信箱</th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php 
+								$i==0;
+								foreach($this->studata as $studata){
+									$i=$i+1;
+						?>	<?php if($this->searchvalue!=null){$sv="&searchvalue=".$this->searchvalue;} ?>
+							<tr class="<?php if($getstuid==$studata['stuid']){echo active;}?>" href="<?php echo $this->baseUrl('power/admin/adminbasis?getstuid='. $studata['stuid'].$sv); ?>" >
+								<td><?php echo $i; ?></td>
+								<td><?php echo $studata['學部名稱'];?></td>
+								<td><?php echo $studata['科系名稱'];?></td>
+								<td><?php echo $studata['班級名稱'];?></td>
+								<td><?php echo $studata['ksuid'];?></td>
+								<td><?php echo $studata['stuid'];?></td>
+								<td><?php echo $studata['u_name'];?></td>
+								<td><?php echo $studata['英文姓名'];?></td>
+								<td><?php echo $studata['電子信箱'];?></td>
+							</tr>
+						<?php } ?>
+						</tbody>
+					</table>
+				</div>
+			<?php }else{echo '暫無資料';} ?>
+			</div>
+		</div>
+	<?php if($getstuid!=null){?>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->stuser->name."(".$this->stuser->stuid.")";?> 的學生資料
+				</h3>
+			</div>
+			<div class="panel-body">
+				<table class="table table-condensed ">
+					<thead>
+						<tr>
+							<th>部別</th>
+							<th>系所</th>
+							<th>班級</th>
+							<th>KSUID</th>
+							<th>學號</th>
+							<th>姓名</th>
+							<th>英文姓名</th>
+							<th>信箱</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr >
+							<td><?php echo $this->stuser->school?></td>
+							<td><?php echo $this->stuser->department;?></td>
+							<td><?php echo $this->stuser->class;?></td>
+							<td><?php echo $this->stuser->user_id?></td>
+							<td><?php echo $this->stuser->stuid;?></td>
+							<td><?php echo $this->stuser->name;?></td>
+							<td><?php echo $this->stuser->enname;?></td>
+							<td><?php echo $this->stuser->email;?></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<?php echo $this->stuser->name."(".$this->stuser->stuid.")";?> 的證照資料
+				</h3>
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-md-12">
+						<br/>
+						<div class="tabbable" id="tabs-299909">
+							<ul class="nav nav-tabs"> 
+								<li <?php if($admintype==$this->types_key[1]){ echo 'class="active"' ;} ?> >
+									<a href="<?php echo $this->baseUrl('power/admin/adminbasis?getstuid='.$getstuid.'&admintype='.$this->types_key[1]); ?>" >資訊證照</a>
+								</li>
+								<li <?php if($admintype==$this->types_key[2]){ echo 'class="active"' ;} ?>>
+									<a href="<?php echo $this->baseUrl('power/admin/adminbasis?getstuid='.$getstuid.'&admintype='.$this->types_key[2]); ?>" >專業證照</a>
+								</li>
+								<li <?php if($admintype==$this->types_key[3]){ echo 'class="active"' ;} ?>>
+									<a href="<?php echo $this->baseUrl('power/admin/adminbasis?getstuid='.$getstuid.'&admintype='.$this->types_key[3]); ?>" >英文證照</a>
+								</li>
+								<li <?php if($admintype==0){ echo 'class="active"' ;}?>>
+									<a href="<?php echo $this->baseUrl('power/admin/adminbasis?getstuid='.$getstuid.'&admintype=0'); ?>" >我的能力</a>
+								</li>
+							</ul>
+							<div class="tab-content">
+								<div class="tab-pane active" id="panel-1">
+									<table class="table table-hover">
+										<thead>
+											<tr>
+												<th>#</th>
+												<th>認證日期</th>
+												<th>通報日期</th>
+												<th>類型</th>
+												<th>技專代號</th>
+												<th>級別</th>
+												<th>
+													<span>證照名稱 </span>
+													<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="證照掃描後，可點選證照名稱瀏覽證照">
+														<i class="fa fa-info-circle" aria-hidden="true"></i>
+													</a>
+												</th>
+												<th>
+													<span>狀態 </span>
+													<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="掃描證照→自行點擊送審→等待審核">
+														<i class="fa fa-info-circle" aria-hidden="true"></i>
+													</a>
+												</th>
+												<th>動作</th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody>
+										<?php $datalist = $this->data ;
+												if($datalist){ 
+													$i==0;
+													foreach($datalist as $d){
+														$i=$i+1;
+										?>	
+											<tr class="active">
+											<td><?php echo $i; ?></td>
+											<td><?php echo substr( $d['issue'] , 0 , 10 );?></td>
+											<td><?php echo substr( $d['created'] , 0 , 10 );?></td>
+											<td>
+											<?php $num=0;?>
+											<?php if($d['資訊狀態']==1){ 
+													$num=$num+1;
+											?>
+													<button type="button" class="btn  btn-primary disabled">資</button>
+											<?php }?>
+											<?php if($d['專業狀態']==1){ 
+													$num=$num+1;
+											?>
+												<button type="button" class="btn  btn-success disabled">專</button>
+											<?php }?>
+											<?php if($d['英文狀態']==1){
+													$num=$num+1;
+											?>
+												<button type="button" class="btn  btn-warning disabled">英</button>
+											<?php }?>
+											<?php if($num==0){ ?>
+												<button type="button" class="btn  disabled">無</button>
+											<?php }?>
+											</td>
+											<td><?php echo $d['tcode'];?></td>
+											<td><?php echo $d['series'];?></td>
+											<td><?php if($d['圖片狀態']==1){?>
+												<a type="button"  data-toggle="modal" data-target="#img<?php echo $d['assist_id']?>"><?php echo $d['cername'];?></a>
+												<!-- 資訊證照圖片 Modal -->
+													<div id="img<?php echo $d['assist_id']?>" class="modal fade" role="dialog">
+													<div class="modal-dialog modal-lg">
+														<!-- Modal content-->
+														<div class="modal-content">
+														<div class="modal-header">
+															<button type="button" class="close" data-dismiss="modal">&times;</button>
+															<h4 class="modal-title">證照圖片</h4>
+														</div>
+														<div class="modal-body">
+															<span><?php echo $d['cname'];?></span>
+															<img alt="<?php echo $this->stuser->stuid.'-'.$d['tcode'].'.jpg';?>" src="<?php echo $this->licenses_url.$this->stuser->stuid.'-'.$d['tcode'].'.jpg';?>" style="width:100%;" />
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+														</div>
+														</div>
+													</div>
+													</div>
+												<!-- Modal -->
+											<?php }else{ echo $d['cername'];}?></td>
+											<td>
+												<?php switch ($d['s_name']) {
+														case '通過':
+												?>
+													<button type="button" class="btn btn-xs btn-success disabled"><?php echo $d['s_name'];?></button>
+												<?php			
+														break;
+														case '抵免中':
+												?>
+													<button type="button" class="btn btn-xs btn-success disabled"><?php echo $d['s_name'];?></button>
+												<?php
+														break;
+														case '再審中':
+												?>
+													<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="<?php echo $d['comment'];?>"><?php echo $d['s_name'];?></a>
+												<?php		
+														break;
+														case '不通過':
+												?>
+													<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="<?php echo $d['comment'];?>"><?php echo $d['s_name'];?></a>
+												<?php			
+														break;
+														case '己建檔':
+															if($d['圖片狀態']==0){echo '待掃描';}else if($num>0){ echo '等待自行送審';}else{echo '暫無';}
+														break;
+														case '申請中':
+															if($d['圖片狀態']==0){echo '待掃描';}else if($num>0){ echo '等待自行送審';}else{echo '暫無';}
+														break;
+														default:
+															echo $d['s_name'];
+														break;
+													}
+												?>
+											</td>
+											<td><?php if($admintype==0){if($d['圖片狀態']!=1){?>
+												<button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#addimg<?php echo $d['assist_id']?>">上傳證照</button>
+												<!-- 證照上傳 Modal -->
+												<div id="addimg<?php echo $d['assist_id']?>" class="modal fade" role="dialog">
+													<div class="modal-dialog ">
+													<!-- Modal content-->
+														<div class="modal-content ">
+															<form  id="commentForm" action ="<?php echo $this->baseUrl('power/admin/adminbasis'); ?>" method = 'POST' enctype="multipart/form-data">
+																<div class="modal-header">
+																	<button type="button" class="close" data-dismiss="modal">&times;</button>
+																	<h4 class="modal-title">上傳證照</h4>
+																</div>
+																<div class="modal-body">
+																	<span>技專代號：<?php echo $d['tcode'];?></span><br/>
+																	<span>送審證照名稱：<?php echo $d['cname'];?></span><br/>
+																	<span>級別：<?php echo $d['series'];?></span><br/><br/>
+																	<input type="hidden" id="tcode" name="tcode" value="<?php echo $d['tcode'];?>"/>
+																	<input type="hidden" id="getsearch" name="getsearch" value="<?php echo $this->searchvalue;?>"/>
+																	<input type="hidden" id="do" name="do" value="addlicensesimg"/>
+																	<input type="hidden" id="getstuid" name="getstuid" value="<?php echo $this->stuser->stuid ;?>"/>
+																	<i class="fa fa-picture-o" aria-hidden="true"></i> <span>證照圖片上傳</span>
+																	<input type="file" id="licensesimg" name="licensesimg"/>
+																	<br/>
+																	<p class="help-block">
+																		<i class="fa fa-lightbulb-o" aria-hidden="true"></i> <span>需清晰清楚，避免色彩太暗需先裁切</span>
+																	</p>
+																	
+																</div>
+																<div class="modal-footer">
+																	<button type="submit" class="btn btn-primary" >送出</button>
+																	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+																</div>
+															</form>
+														</div>
+													</div>
+												</div>
+												<?php }else{?>
+													<button type="button" class="btn btn-warning btn-block"  data-toggle="modal" data-target="#updateimg<?php echo $d['assist_id']?>" >更換證照</button>
+													<!-- 證照上傳 Modal -->
+												<div id="updateimg<?php echo $d['assist_id']?>" class="modal fade" role="dialog">
+													<div class="modal-dialog modal-lg">
+													<!-- Modal content-->
+														<div class="modal-content ">
+															<form  id="commentForm" action ="<?php echo $this->baseUrl('power/admin/adminbasis'); ?>" method = 'POST' enctype="multipart/form-data">
+																<div class="modal-header">
+																	<button type="button" class="close" data-dismiss="modal">&times;</button>
+																	<h4 class="modal-title">證照圖片修改</h4>
+																</div>
+																<div class="modal-body">
+																	<span>技專代號：<?php echo $d['tcode'];?></span><br/>
+																	<span>送審證照名稱：<?php echo $d['cname'];?></span><br/>
+																	<span>級別：<?php echo $d['series'];?></span><br/><br/>
+																	<input type="hidden" id="getsearch" name="getsearch" value="<?php echo $this->searchvalue;?>"/>
+																	<input type="hidden" id="do" name="do" value="addlicensesimg"/>
+																	<input type="hidden" id="getstuid" name="getstuid" value="<?php echo $this->stuser->stuid ;?>"/>
+																	<span>目前圖片：</span><br/>
+																	<img alt="目前證照圖片<?php echo $this->stuser->stuid.'-'.$d['tcode'].'.jpg';?>" src="<?php echo $this->licenses_url.$this->stuser->stuid.'-'.$d['tcode'].'.jpg';?>" style="width:100%;" />
+																	<input type="hidden" id="tcode" name="tcode" value="<?php echo $d['tcode'];?>"/><br/><br/>
+																	<i class="fa fa-picture-o" aria-hidden="true"></i> <span>更換證照圖片上傳</span>
+																	<input type="file" id="licensesimg" name="licensesimg"/>
+																	<br/>
+																	<p class="help-block">
+																		<i class="fa fa-lightbulb-o" aria-hidden="true"></i> <span>需清晰清楚，避免色彩太暗需先裁切</span>
+																	</p>
+																	
+																</div>
+																<div class="modal-footer">
+																	<button type="submit" class="btn btn-primary" >送出</button>
+																	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+																</div>
+															</form>
+														</div>
+													</div>
+												</div>
+												<?php }?>
+											</td>
+											<td><?php if($d['圖片狀態']==1){?><?php if($num!=0){?><button type="button" class="btn btn-warning btn-block"  data-toggle="modal" data-target="#selectCategory<?php echo $d['assist_id']?>">點擊送審</button>
+									
+												<!-- 送審視窗 Modal -->
+												<div id="selectCategory<?php echo $d['assist_id']?>" class="modal fade" role="dialog">
+												<div class="modal-dialog">
+													<!-- Modal content-->
+													<div class="modal-content">
+													<div class="modal-header">
+														<button type="button" class="close" data-dismiss="modal">&times;</button>
+														<h4 class="modal-title">證照送審</h4>
+													</div>
+													<div class="modal-body">
+														<span>技專代號：<?php echo $d['tcode'];?></span><br/>
+														<span>送審證照名稱：<?php echo $d['cname'];?></span><br/>
+														<span>級別：<?php echo $d['series'];?></span><br/><br/>
+														<span>請您點選所要送審之類別：</span>
+														<br/>
+														<div style="text-align:center;">
+															<?php if($d['資訊狀態']==1){ 
+														?>
+															<button type="button" class="btn btn-lg btn-primary" onclick="updatelicensestype(<?php echo $this->types_key[1]; ?>,<?php echo "'".$d['tcode']."','".$d['cname']."','".$d['series']."','".$d['assist_id']."'"?>)" >資訊<br/>證照</button>
+														<?php }?>
+														<?php if($d['專業狀態']==1){ 
+														?>
+															<button type="button" class="btn btn-lg btn-success" onclick="updatelicensestype(<?php echo $this->types_key[2]; ?>,<?php echo "'".$d['tcode']."','".$d['cname']."','".$d['series']."','".$d['assist_id']."'"?>)" >專業<br/>證照</button>
+														<?php }?>
+														<?php if($d['英文狀態']==1){
+														?>
+															<button type="button" class="btn btn-lg btn-warning " onclick="updatelicensestype(<?php echo $this->types_key[3]; ?>,<?php echo "'".$d['tcode']."','".$d['cname']."','".$d['series']."','".$d['assist_id']."'"?>)" >英文<br/>證照</button>
+														<?php }?>
+														</div>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+													</div>
+													</div>
+												</div>
+												</div>
+												<!-- Modal -->
+											<?php } } }?>
+											</td>
+										<?php 
+													}
+												}
+										?>	 
+										</tbody>
+									</table>
+									
+								</div>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div style="padding:20px;">
+				<button type="button" class="btn btn-block btn-default" style="font-size:20px;" data-toggle="modal" data-target="#myModal12">
+					<i class="fa fa-plus" aria-hidden="true"></i><span>　新　增　證　照</span>
+				</button>
+				<br/>
+				<!-- 新增證照Modal -->
+				<div id="myModal12" class="modal fade" role="dialog">
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">新增證照</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+						<label>信箱:</label>
+						<input type="text" class="form-control"  value="<?php echo $this->stuser->email;?>" readonly>
+						</div>
+						<div class="form-group">
+						<label>電話:</label>
+						<input type="text" class="form-control" value="<?php echo $this->stuser->tel;?>" readonly>
+						</div>
+						<div class="form-group">
+						<label>認證日期:</label>
+						<input id='myissue' name='myissue' class="form-control"  type="date"  >
+						</div>
+						<div class="form-group">
+							<label class="radio-inline"><input type="radio" name='selecttype'  value='1'>分類搜尋</label>
+							<label class="radio-inline"><input type="radio" name='selecttype' checked value='2'>關鍵字快速搜尋</label>
+						</div>
+						<div class="form-group">
+							
+							<div id='catalog' style='display:none' title='要選擇3個選單'>
+								<!--動態取得第一階層下拉式選單-->							
+								<!--利用隱藏欄位指定預設的選項-->
+								<label>證照分類:</label>
+								<select class="form-control" id="categories">
+									<option>請選擇</option>
+									<?php $categorieslist = $this->categories ;
+											if($categorieslist){ 
+												foreach($categorieslist as $categoriesdata){
+									?>		
+														<option value='<?php echo $categoriesdata['id']?>'><?php echo $categoriesdata['name']?></option>
+									<?php 
+												}
+											}
+									?>	 
+								</select>
+								<br>
+								<label>發照機構:</label>
+								
+								<select style="width:99% ;padding:0px 14px;"  disabled="disabled" class="form-control" id="agency" name="agency">
+									<option >請先選擇證照分類</option>
+								</select>
+								<br>
+								<label>證照名稱:</label>
+								<select style="width:99% ;padding:0px 14px;"  disabled="disabled" class="form-control" id="certification" name="certification">
+									<option value="" >請先選擇發照機構</option>
+								</select>
+								<br>	
+							</div>
+							<div id='search' title='至少三個英文字母'>
+								<span>證照名稱:</span>
+								<input id='autoComplete' name='mytcode' class='typeahead form-control' placeholder="輸入任意與證照名稱或發行單位至少三個字以上的關鍵字或其組合"  />
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" onClick="insertassist()">通報</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+					</div>
+				</div>
+			</div>
+			<!-- Modal -->
+		</div>
+		<?php } ?>	
+	</div>
+</div>
+
+
+
+<!-- JS file -->
+<script src="/ccawww/public/js/jquery.easy-autocomplete.js"></script> 
+	
+<script>
+function validateForm() {
+    var x = document.forms["searchform"]["searchvalue"].value;
+    if (x == null || x == "") {
+        alert("欄位不得為空");
+        return false;
+    }
+}
+//關鍵字搜尋證照
+var options = {
+	url: function(autoComplete) {
+		return "http://localhost/ccawww/public/power/student/studentindex?do=getlicenses&autoComplete=" + autoComplete ;
+	},
+	list: {
+		maxNumberOfElements: 20,
+		match: {
+			enabled: true
+		},
+		onSelectItemEvent: function() {
+			var value = $("#autoComplete").getSelectedItemData().tcode;
+
+			$("#autoComplete").val(value).trigger("change");
+		}
+	},
+	getValue: "allitem"
+	
+};
+
+$("#autoComplete").easyAutocomplete(options);
+//關鍵字搜尋證照結束
+$(document).ready(function(){
+	$('.datatable').DataTable();
+	$('.stutable tbody tr').click( function() {
+		window.location = $(this).attr('href');
+	}).hover( function() {
+		$(this).toggleClass('hover');
+	});
+	$('[data-toggle="popover"]').popover();
+	$("#infquestion").click(function(){
+		var infval ="<?php Print($this->unit->information) ;?>";
+		var infcountval ="<?php Print($advcount['infcount']);?>";
+		if(infcountval!=0){
+		$(".advisoryContValue").text(infcountval);
+		}
+		
+		$(".questionModal-title").text("資訊證照發問");
+		$("#unit_id").val(infval);
+	});
+	$("#advisoryShow").click(function(){
+		$("#advisoryDiv").show("slow");
+		$("#advisoryShow").hide();
+		$("#advisoryHide").show();
+		xxx
+		$("infquestion").text("資訊證照發問與回覆");
+		$(".advisoryContValue").text("");
+	});
+	$("#advisoryHide").click(function(){
+		$("#advisoryDiv").hide("slow");
+		$("#advisoryHide").hide();
+		$("#advisoryShow").show();
+	});
+	$("input[name='selecttype']").change(function () {
+		if ($("input[name='selecttype']:checked").val() =='1') {
+			$('#catalog').show();
+			$('#search').hide();
+		} else {
+			$('#catalog').hide();
+			$('#search').show();
+		}
+	});
+	// 證照分類變更後執行取得發照單位
+	$('#categories').change(getagency); 
+	// 發照單位變更後執行取得證照名稱
+	$('#agency').change(getcertification); 
+
+});
+
+//動態取得機構資料
+function getagency(){
+    var cate = $('#categories').find(':selected').val();
+	$('#certification').empty().append('<option >請先選擇發照機構</option>');
+	$('#certification').attr('disabled', true);	
+	var dovalue ='getagency';
+    if(cate != '請選擇')
+    {
+        $.ajax({
+            type     : 'GET',
+			url      : 'http://localhost/ccawww/public/power/student/studentindex',
+			dataType: "json",
+			data: {
+				'categories_id' :cate,
+				'do':dovalue
+			},
+            success  : function(data) { 
+                var output ="";
+				if(data.length==0){
+					$('#agency').empty().append('<option >該分類發照機構目前為空</option>');
+					$('#agency').attr('disabled', true);	
+				}else{
+					$('#agency').empty().append('<option selected>請選擇</option>');
+					for (i = 0; i < data.length; i++) { 
+					if(data[i].id==""||data[i].id==null||data[i].name==""||data[i].name==null){	
+					}else{ 
+						output = '<option value=' + data[i].id+ '>' + data[i].name  + '</option>';
+					}	
+						$('#agency').attr('disabled', false);	
+						$('#agency').append(output);
+				}
+			}
+
+            },
+			error: function(xhr, ajaxOptions, thrownError)
+			{
+				alert(xhr.status);
+				alert(thrownError);
+			
+			}
+        }); 
+    }
+    else
+    {
+        $('#agency').empty().append('<option >請選擇請先選擇證照分類</option>');
+		$('#agency').attr('disabled', true);	
+    }
+}
+function getcertification(){
+    var age = $('#agency').find(':selected').val();
+	var dovalue ='getagency';
+    if(age != '請選擇')
+    {
+        $.ajax({
+            type     : 'GET',
+			url      : 'http://localhost/ccawww/public/power/student/studentindex',
+			dataType: "json",
+			data: {
+				'categories_id' :age,
+				'do':dovalue
+			},
+            success  : function(data) { 
+                var output ="";
+				if(data.length==0){
+					$('#certification').empty().append('<option value="" >該發照機構證照目前為空</option>');
+					$('#certification').attr('disabled', true);	
+				}else{
+					$('#certification').empty().append('<option value=""  selected>請選擇</option>');
+					for (i = 0; i < data.length; i++) { 
+					if(data[i].id==""||data[i].id==null||data[i].name==""||data[i].name==null){	
+					}else{ 
+						output = '<option value=' + data[i].id+ '>' + data[i].name  + '</option>';
+					}	
+						$('#certification').attr('disabled', false);	
+						$('#certification').append(output);
+				}
+				
+				
+			}
+
+            },
+			error: function(xhr, ajaxOptions, thrownError)
+			{
+				alert(xhr.status);
+				alert(thrownError);
+			
+			}
+        }); 
+    }
+    else
+    {
+        $('#certification').empty().append('<option >請選擇請先選擇發照機構</option>');
+		$('#certification').attr('disabled', true);	
+    }
+}
+$(function () {
+   $('a[href*=#]:not([href=#])').click(function() {
+	   var target = $(this.hash);
+	   $('html,body').animate({
+		   scrollTop: target.offset().top
+	   }, 950);
+	   return false;
+   });
+});
+   
+
+function getadvisory(id){
+	charset="utf8";
+	var unit_id = $("#unit_id").val();
+	var dovalue='getadvisory';
+	var source='student';
+	$.ajax({
+		type: "GET",
+		url: "http://localhost/ccawww/public/power/student/studentindex",
+		dataType: "json",
+		data: {
+			'stu_id' : id,
+			'unit_id':unit_id,
+			'do':dovalue,
+			'source':source
+		},
+		success: function(data)
+		{
+			var answer_cont="";
+			$('#advisoryDiv').text("");
+			for (i = 0; i < data.length; i++) { 
+				if(data[i].回答內容==""||data[i].回答內容==null){
+				}else{ 
+					answer_cont = '<div style="color:#228B22;padding-left:20px;"> 回覆內容：'
+					+data[i].回答內容+'<br/>回覆時間：'+data[i].回答時間+'</div>'
+				}
+				$('#advisoryDiv').append(
+				'<div >問題內容：' + data[i].問題+'<br/>發問時間：' + data[i].發問時間 + '</div>' + answer_cont +'<hr/>');
+				answer_cont="";
+			}
+			
+		},
+		
+		error: function(xhr, ajaxOptions, thrownError)
+		{
+			alert(xhr.status);
+			alert(thrownError);
+		   
+		}
+	});
+}
+
+function updatelicensestype(types,tcode,name,series,assist_id)
+{	
+	var dovalue='updatelicensestype';
+	var typesname='';
+	if(series==null||series==''){
+	}else{
+		series="("+series+")"
+	}
+	if(types=="<?php Print($this->types_key[1]); ?>"){
+		typesname="<?php Print($this->types_value[1]); ?>";
+	}else if(types=="<?php Print($this->types_key[2]); ?>"){
+		typesname="<?php Print($this->types_value[2]); ?>";
+	}else if(types=="<?php Print($this->types_key[3]); ?>"){
+		typesname="<?php Print($this->types_value[3]); ?>";
+	}
+	var r = confirm("是否要允許技專代號為:　"+tcode+"　的　"+name+series+"　通報為　"+typesname);
+	if (r == true) {
+		$.ajax(
+		{
+			type: "GET",
+			url: "http://localhost/ccawww/public/power/student/studentindex",
+			dataType: "json",
+			data: {
+				'types' : types,
+				'assist_id' : assist_id,
+				'do':dovalue
+			},
+			success: function(data)
+			{
+				location.reload();
+			},
+			error: function(xhr, ajaxOptions, thrownError)
+			{ 
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+	}
+};
+function insertassist()
+{	
+	var myissue= $('#myissue').val();
+	var selecttype= $("input[name='selecttype']:checked").val();
+	var certification= $('#certification').val();
+	var autoComplete= $('#autoComplete').val();
+	var status=false;
+	var dovalue='insertassist';
+	var getstuid="<?php Print($this->stuser->stuid); ?>";
+	//
+	var mytcode='';
+	//=時為分類搜尋
+	if(myissue!=""){
+		if(selecttype==1){
+			if(certification!=""){
+				status=true;
+				mytcode=certification;
+			}else{
+				alert("您目前狀態為分類搜尋，請選擇您的證照");
+				$('#certification').focus();
+			}
+		}else{
+			if(autoComplete!=''){
+				status=true;
+				mytcode=autoComplete;
+			}else{
+				alert("您目前狀態為關鍵字搜尋，輸入框不得為空");
+				$('#autoComplete').focus();
+			}
+		}
+	}else{
+		alert("您的證照發照日期尚未填寫。");
+		$('#myissue').focus();
+	}
+	if(status==true){
+		$.ajax({
+			type: "GET",
+			url: "<?php echo $this->baseUrl('power/admin/adminbasis'); ?>",
+			dataType: "json",
+			data: {
+				'mytcode' : mytcode,
+				'myissue':myissue,
+				'getstuid':getstuid,
+				'do':dovalue
+			},
+			success: function(data)
+			{
+				location.reload();
+			},
+			
+			error: function(xhr, ajaxOptions, thrownError)
+			{
+				alert(xhr.status);
+				alert(thrownError);
+			
+			}
+		});
+	}
+
+};
+
+</script>

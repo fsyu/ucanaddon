@@ -1,0 +1,371 @@
+<?php 
+	$bookmark = $_GET["bookmark"];
+ ?>
+<style>
+.container{
+	width: 90%;
+}
+body{
+	font-size:16px;
+}
+.form-control{
+	font-size:18px;
+}
+.input-sm{
+	font-size:12px;
+}
+.statusbtn{
+	font-size:16px;
+}
+.container-fluid{
+	background-color:#FFF;
+}
+</style>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<br/>
+			<div class="tabbable" id="tabs-154656">
+				<ul class="nav nav-tabs">
+					<?php $datalist = $this->bookmarkdata ;
+						$categoryarray=array();
+					if($bookmark==null){$bookmark=$datalist[0]['category'];}
+						foreach($datalist as $d){
+							array_push($categoryarray,$d['category']);
+					?>								
+							<li <?php if($bookmark==$d['category']){ echo 'class="active"';} ?> >
+								<a href="<?php echo $this->baseUrl('power/admin/adminlicenses?bookmark='.$d['category']); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i> <?php echo $d['category']; ?> </a>
+							</li>
+					<?php 
+						}
+						?>
+					<li <?php if($bookmark=='search'){ echo 'class="active"';} ?> >
+						<a href="<?php echo $this->baseUrl('power/admin/adminlicenses?bookmark=search'); ?>"><i class="fa fa-search" aria-hidden="true" style="color:#0066FF;"></i> 搜尋全部</a>
+					</li>
+					<li>
+						<a href="#" data-toggle="modal" data-target="#addlicModal" ><i class="fa fa-plus" aria-hidden="true" style="color:#00AA55;"> </i> 新增證照</a>
+					</li>
+				</ul>
+				<br/>
+			</div>
+			<!-- 證照新增 Modal -->
+			<div id="addlicModal" class="modal fade" role="dialog">
+				<div class="modal-dialog ">
+				<!-- Modal content-->
+					<div class="modal-content ">
+						<form  id="commentForm" method = 'POST' enctype="multipart/form-data" >
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title"><i class="fa fa-plus" aria-hidden="true"> </i> 新增證照資料</h4>
+							</div>
+							<div class="modal-body">
+								<form role="form">
+									<div class="form-group">
+										<label>
+											技專編號*(TCODE)
+										</label>
+										<input  class="form-control" id="tcode" name="tcode"/>
+									</div>
+									<div class="form-group">
+										<label>
+											證照代碼(SCODE)
+										</label>
+										<input class="form-control" id="scode" name="scode" placeholder="506XXXXX" />
+									</div>
+									<div class="form-group">
+										<label>
+											證照名稱*(NAME)
+										</label>
+										<input class="form-control" id="name" name="name" />
+									</div>
+									<div class="form-group">
+										<label>
+											國內外證照*(CTYPE)
+										</label>
+										<select class="form-control" id="ctype" name="ctype">
+											<option>請選擇</option>
+											<option>國內</option>
+											<option>國外</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label>
+											級數/分數(SERIES)
+										</label>
+										<input class="form-control" id="series" name="series"/>
+									</div>
+									<div class="form-group">
+										<label>
+											證照類別*(CATEGORY)
+										</label>
+										<select class="form-control" id="category" name="category">
+											<option>請選擇</option>
+										<?php
+											foreach($datalist as $d){
+										?>
+												<option><?php echo $d['category']; ?></option>	
+												
+										<?php 
+											}
+										?>
+										</select>
+									</div>
+									<div class="form-group">
+										<label>
+											證照類型*(TYPE)
+										</label>
+										<select class="form-control" id="information" name="information">
+											<option>請選擇</option>
+											<option value='1'>資訊</option>
+											<option value='0'>專業</option>
+											<option value='2'>語言</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label>
+											發照單位*(ORGANIZATION)
+										</label>
+										<input class="form-control" id="organization" name="organization"/>
+									</div>
+									<div class="form-group">
+										<label>
+											相當於(甲/乙/丙)(EQUIVALENT)
+										</label>
+										<select class="form-control" id="equivalent" name="equivalent">
+											<option>請選擇</option>
+											<option>甲</option>
+											<option>乙</option>
+											<option>丙</option>
+										</select>
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="submit" class="btn btn-primary" onclick="insertedudb();">送出</button>
+								<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<!-- 證照新增 Modal結束-->
+			<div class="tab-content">
+				<div class="tab-pane <?php if(in_array($bookmark, $categoryarray)){ echo 'active'; } ?>" id="panel-noreply">
+					<table class="table table-hover datatable">
+						<thead>
+							<tr class="success">
+								<th style="width:80px;">技專代號</th>
+								<th style="width:40%">證照名稱</th>
+
+								
+								<th>等級</th>
+								<th>發照單位</th>
+								<th data-orderable="false" style=" text-align:center;width:250px;">動作 <a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="筆型工具為修改；眼睛為通報開啟狀態修改">
+							<i class="fa fa-info-circle" aria-hidden="true"></i></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php $licenseslist = $this->licensesdata ;
+							if($licenseslist){ 
+								$i==0;
+								foreach($licenseslist as $licenses){
+						?>	
+									<tr class="active">
+									<td><?php echo $licenses['tcode'];?></td>
+									<td><?php echo $licenses['name'];?></td>
+									<td><?php echo $licenses['series'];?></td>
+									<td><?php echo $licenses['organization'];?></td>
+									<td  align="center" >
+										<button type="button" class="btn btn-primary"style="font-size:16px;" onClick="update(<?php echo $licenses['edudb_id']?>)">
+											<i class="fa fa-pencil" aria-hidden="true"></i> 暫無
+										</button>　
+										<button type="button" class="btn btn-info statusbtn" name='statusbtn<?php echo $licenses['edudb_id'];?>'  <?php if($licenses['edu_status']==0){ echo 'style="display:none"'; } ?>
+											onClick="changestatus(0<?php echo ",'".$licenses['edudb_id']."','".$licenses['tcode']."','".$licenses['name']."','".$licenses['series']."'" ?>)">
+											<i class="fa fa-eye-slash" aria-hidden="true" ></i>
+											<spne>　關閉顯示</spne>
+										</button>
+										<button  type="button" class="btn btn-warning statusbtn" name='statusbtn<?php echo $licenses['edudb_id'];?>' <?php if($licenses['edu_status']==1){ echo 'style="display:none"'; } ?>
+											onClick="changestatus(1<?php echo ",'".$licenses['edudb_id']."','".$licenses['tcode']."','".$licenses['name']."','".$licenses['series']."'" ?>)">
+											<i class="fa fa-eye" aria-hidden="true" ></i>
+											<spne>　開啟顯示</spne>
+										</button>
+									</td>
+						<?php 
+								}
+							}
+						?>	 
+						</tbody>
+					</table>
+				</div>
+				<div class="tab-pane <?php if($bookmark=='search') echo 'active';?>" id="panel-noreply" >
+					<br/>
+					<form role="form" class="form-inline" method='POST' onsubmit='return IsValided(this); ' 
+		action="<?php echo $this->baseUrl('power/admin/adminlicenses?bookmark=search'); ?>"  style="text-align:center;">
+						<div id='search' style="padding:10px 100px 40px 100px;">
+							<span>證照名稱:</span>
+							<input id='searchvalue' name='searchvalue' style="width:50%;margin:0px 10px 0px 10px;" class=' form-control' placeholder="輸入任意與證照名稱或發行單位至少三個字以上的關鍵字或其組合" value="<?php if($this->searchvalue!=null){ echo $this->searchvalue;}?>" />
+							<button type="submit" class="btn btn-primary" >搜尋</button>
+						</div>
+					</form>
+					<?php $searchlist = $this->searchdata ;
+						if($searchlist!=null){ ?>
+						<table class="table table-hover datatable">
+							<thead>
+								<tr class="success">
+									<th style="width:80px;">技專代號</th>
+									<th style="width:40%">證照名稱</th>
+									<th>等級</th>
+									<th>發照單位</th>
+									<th data-orderable="false" style=" text-align:center;width:250px;">動作 <a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="筆型工具為修改；眼睛為通報開啟狀態修改">
+							<i class="fa fa-info-circle" aria-hidden="true"></i></th>
+								</tr>
+							</thead>
+							<tbody>
+							<?php foreach($searchlist as $search){	?>	
+									<tr class="active">
+									<td><?php echo $search['tcode'];?></td>
+									<td><?php echo $search['name'];?></td>
+									<td><?php echo $search['series'];?></td>
+									<td><?php echo $search['organization'];?></td>
+									<td  align="center" >
+										<button type="button" class="btn btn-primary"style="font-size:16px;">
+											<i class="fa fa-pencil" aria-hidden="true"></i> 修改
+										</button>　
+										<button type="button" class="btn btn-info statusbtn" name='statusbtn<?php echo $search['edudb_id'];?>'  <?php if($search['edu_status']==0){ echo 'style="display:none"'; } ?>
+											onClick="changestatus(0<?php echo ",'".$search['edudb_id']."','".$search['tcode']."','".$search['name']."','".$search['series']."'" ?>)">
+											<i class="fa fa-eye-slash" aria-hidden="true" ></i>
+											<spne>　關閉顯示</spne>
+										</button>
+										<button  type="button" class="btn btn-warning statusbtn" name='statusbtn<?php echo $search['edudb_id'];?>' <?php if($search['edu_status']==1){ echo 'style="display:none"'; } ?>
+											onClick="changestatus(1<?php echo ",'".$search['edudb_id']."','".$search['tcode']."','".$search['name']."','".$search['series']."'" ?>)">
+											<i class="fa fa-eye" aria-hidden="true" ></i>
+											<spne>　開啟顯示</spne>
+										</button>
+									</td>
+							<?php 
+								}
+							?>	 
+							</tbody>
+						</table>
+					<?php } ?>
+				</div>
+			</div>
+		</div>	
+	</div>	
+</div>	
+<!-- 修改完成時時Modal -->
+<div class="modal fade modal-center" id="succModal" role="dialog" >
+	<div class="modal-dialog modal-sm" >
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" >&times;</button>
+				<h4 class="modal-title">修改完成</h4>
+			</div>
+		</div>
+	</div>
+</div>
+<script>	
+$(document).ready(function(){
+	$('.datatable').DataTable();
+	$('[data-toggle="popover"]').popover();
+});
+function insertedudb(){
+	var agreestatus=1;
+	var tcode= $("#tcode").val();
+	var scode= $("#scode").val();
+	var name= $("#name").val();
+	var ctype= $('#ctype').find(':selected').val();
+	var series= $("#series").val();
+	var category= $("#category").val();
+	var organization= $("#organization").val();
+	var equivalent= $("#equivalent").find(':selected').val();
+	var information= $("#information").find(':selected').val();
+	var informationvalue=$("#information").find(':selected').text();
+	var dovalue='insertedudb';
+	if(tcode==""||name==""||ctype=="請選擇"||category=="請選擇"||organization==""||information=="請選擇"){
+		alert("*字號欄位不得為空");
+	}else{
+		if(series==null||series==""){
+		}else{
+			series="("+series+")"
+		}
+		if(equivalent=="請選擇"){
+			equivalent="";
+		}
+		var agreestatus=0;
+		var r = confirm("是否要新增技專代號:　"+tcode+"　\n證照代碼:　"+scode+"　\n國內/外:　"+　ctype+"　\n類別:　"+category+"　\n發照單位:　"+organization+"　\n相當於:　"+equivalent+"級"+informationvalue+"　的　"+name+series+"　證照");
+		if (r == true) {
+			agreestatus=1;
+		}
+		if(agreestatus==1){
+			$.ajax({
+				type: "GET",
+				url: "<?php echo $this->baseUrl('power/admin/adminlicenses'); ?>",
+				dataType: "json",
+				data: {
+					'tcode' : tcode,
+					'scode' : scode,
+					'name' : name,
+					'ctype' : ctype,
+					'series' : series,
+					'category' : category,
+					'organization' : organization,
+					'information' : information,
+					'equivalent' : equivalent,
+					'do':dovalue
+				},
+				success: function(data)
+				{
+					$("#succModal").modal();
+					 location.reload();
+				},
+				
+				error: function(xhr, ajaxOptions, thrownError)
+				{
+					alert(xhr.status);
+					alert(thrownError);
+				}
+			});
+		}
+	}
+}
+function changestatus(status,edudb_id,tcode,name,series){
+	// 當下方問答選擇更改時changestatus則改為1
+	var agreestatus=0;
+	var statustext;
+	var dovalue='updatestatus';
+	if(status==0){
+		statustext="關閉"
+	}else{
+		statustext="顯示"
+	}
+
+	var r = confirm("是否要"+statustext+"技專代號為:　"+tcode+"　的　"+name+series+"　證照");
+	if (r == true) {
+		agreestatus=1;
+	}
+	if(agreestatus==1){
+		$.ajax({
+			type: "GET",
+			url:  "<?php echo $this->baseUrl('power/admin/adminlicenses'); ?>",
+			dataType: "json",
+			data: {
+				'edudb_id' : edudb_id,
+				'open_status' : status,
+				'do':dovalue
+			},
+			success: function(data)
+			{
+				$("#succModal").modal();
+				$('button[name=statusbtn'+edudb_id+']').toggle();
+			},
+			
+			error: function(xhr, ajaxOptions, thrownError)
+			{
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+	}
+}
+</script>

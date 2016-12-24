@@ -1,0 +1,414 @@
+<?php $bookmark = $_GET["bookmark"]; ?>
+<style>
+.container{
+	width: 90%;
+}
+body{
+	font-size:16px;
+}
+.form-control{
+	font-size:18px;
+}
+.input-sm{
+	font-size:12px;
+}
+.container-fluid{
+	background-color:#FFF;
+}
+</style>
+    <div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<br/>
+				<div class="tabbable" id="tabs-154656">
+					<ul class="nav nav-tabs">
+						<li <?php if($bookmark==null||$bookmark=='noreply') echo 'class="active"';?>>
+							<a href="<?php echo $this->baseUrl('power/admin/adminmessage?bookmark=noreply') ?>"><i class="fa fa-child" aria-hidden="true"></i> 尚未回覆問題</a>
+						</li>
+						<li  <?php if($bookmark=='track') echo 'class="active"';?>>
+							<a href="<?php echo $this->baseUrl('power/admin/adminmessage?bookmark=track') ?>"><i class="fa fa-star" aria-hidden="true" ></i> 追蹤問題</a>
+						</li>
+						<li  <?php if($bookmark=='all') echo 'class="active"';?>>
+							<a href="<?php echo $this->baseUrl('power/admin/adminmessage?bookmark=all') ?>"><i class="fa fa-comments-o" aria-hidden="true" ></i> 所有問題</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane <?php if($bookmark==null||$bookmark=='noreply') echo 'active';?>" id="panel-noreply">
+							<br/>
+							<table class="table table-hover">
+								<thead>
+									<tr class="success">
+										<th>#</th>
+										<th>諮詢時間</th>
+										<th>學號</th>
+										<th>聯絡人</th>
+										<th>摘要<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="點選摘要內容進入回覆畫面">	<i class="fa fa-info-circle" aria-hidden="true"></i></a></th>
+										<th>狀態</th>
+										<th style="text-align:center;">動作</th>
+									</tr>
+								</thead>
+								<tbody>
+								<?php $datalist = $this->data ;
+									if($datalist){ 
+										$i==0;
+										foreach($datalist as $d){
+											$i=$i+1;
+								?>	
+											<tr class="active">
+											<td><?php echo $i; ?></td>
+											<td><?php echo $d['發問時間'];?></td>
+											<td><?php echo $d['學號'];?></td>
+											<td><?php echo $d['姓名'];?></td>
+											<td><a  data-toggle="modal" data-target="#myModal<?php echo $d['諮詢單項目ID'];?>"><?php if (mb_strlen($d['問題'] ,"UTF-8")>25){ echo mb_substr( $d['問題'] , 0 , 25 ,"utf-8").'．．．'; } else {echo $d['問題'];};?></a></td>
+											<td><?php if($d['回答內容']==null||$d['回答內容']==""){ ?><font style="color:#FF0000;">尚未處理</font><?php }else{ ?><font style="color:#3CB371;">已處理</font><?php }  ?></td>
+											<td><button type="button" class="btn btn-default btn-block" data-toggle="modal" data-target="#myModal<?php echo $d['諮詢單項目ID'];?>">檢視</button></td>
+											</tr>
+											<!-- 摘要Modal -->
+											<div id="myModal<?php echo $d['諮詢單項目ID'];?>" class="modal fade" role="dialog">
+												<div class="modal-dialog modal-lg">
+												<!-- Modal content-->
+													<div class="modal-content">
+														<form class="form" method="GET" > 
+															<div class="modal-header">
+																<button type="button" class="close" data-dismiss="modal">&times;</button>
+																<h4 class="modal-title">回覆 <span style="color:#FF4500;"><?php echo $d['姓名'];?> ( <?php echo $d['學號'];?> ) </span>於 <?php echo  substr( $d['發問時間'],0,10);?> 的問題</h4>
+															</div>
+															<div class="modal-body">
+															<input type="hidden" name="advisory_id" id="advisory_id" value="<?php echo $d['諮詢單項目ID']; ?>" />
+																<div class="form-group">
+																	<label >系級與班級:</label>
+																	<input type="text" class="form-control" value='<?php echo $d['科系名稱'].'  '.$d['班級名稱'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >信箱:</label>
+																	<input type="text" class="form-control" value='<?php echo $d['電子信箱'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >電話:</label>
+																	<input type="text" class="form-control" value='<?php echo $d['行動電話'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >問題：</label>
+																	<textarea class="form-control" rows="3" readonly><?php echo $d['問題'];?></textarea>
+																</div>
+																<div class="form-group">
+																	<label >回覆：</label>
+																	<textarea class="form-control" rows="5"  name="noreplycont<?php echo $d['諮詢單項目ID']; ?>" ><?php echo $d['回答內容'];?></textarea>
+																</div>
+																<div class="form-group">
+																	<label >追蹤狀態：</label>
+																	<label class="radio-inline"><input type="radio" name="noreplytrack<?php echo $d['諮詢單項目ID']; ?>" value="1" <?php if($d['追蹤狀態']==1){echo "checked";} ?>/>追蹤</label>
+																	<label class="radio-inline"><input type="radio" name="noreplytrack<?php echo $d['諮詢單項目ID']; ?>" value="0" <?php if($d['追蹤狀態']==0){echo "checked";} ?> />無需追蹤</label>
+																</div>
+																<button type="button" class="btn btn-default btn-block advisoryInfShow" name="<?php echo $d['諮詢單項目ID']; ?>" onClick="getadvisory('<?php echo $d['學號']."','".$this->user->department_id ?>')" >瀏覽發問紀錄與回覆</button>
+																<button type="button" class="btn btn-default btn-block advisoryInfHide"  name="<?php echo $d['諮詢單項目ID']; ?>" style="display:none;">隱藏發問紀錄與回覆</button>
+																<br/>
+																<div class="advisoryInfDiv" name="<?php echo $d['諮詢單項目ID']; ?>" style="display:none;">
+																</div>
+																<div class="modal-footer">
+																	<button type="button" class="btn btn-primary" onClick="updateadvisory('noreply','<?php echo $d['諮詢單項目ID'];?>')">送出</button>
+																	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+																</div>
+															</div>
+														</form>
+													</div>
+												</div>
+											</div>
+											<!-- Modal -->
+								<?php 
+										}
+									}
+								?>	 
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane <?php if($bookmark=='track') echo 'active';?>" id="panel-track">
+							<br/>
+							<table class="table table-hover" style="width:100%;">
+								<thead>
+									<tr class="danger">
+										<th>#</th>
+										<th>諮詢時間</th>
+										<th>學號</th>
+										<th>聯絡人</th>
+										<th>摘要<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="點選摘要內容進入回覆畫面">	<i class="fa fa-info-circle" aria-hidden="true"></i></a></th>
+										<th>狀態</th>
+										<th style="text-align:center;">動作</th>
+									</tr>
+								</thead>
+								<tbody>
+								<?php $tracklist = $this->trackdata ;
+									if($tracklist){ 
+										$ti==0;
+										foreach($tracklist as $td){
+											$ti=$ti+1;
+								?>	
+											<tr class="active">
+											<td><?php echo $ti; ?></td>
+											<td><?php echo $td['發問時間'];?></td>
+											<td><?php echo $td['學號'];?></td>
+											<td><?php echo $td['姓名'];?></td>
+											<td><a  data-toggle="modal" data-target="#tdmyModal<?php echo $td['諮詢單項目ID'];?>"><?php if (mb_strlen($td['問題'] ,"UTF-8")>25){ echo mb_substr( $td['問題'] , 0 , 25 ,"utf-8").'．．．'; } else {echo $td['問題'];};?></a></td>
+											<td><?php if($td['回答內容']==null||$td['回答內容']==""){ ?><font style="color:#FF0000;">尚未處理</font><?php }else{ ?><font style="color:#3CB371;">已處理</font><?php }  ?></td>
+											<td><button type="button" class="btn btn-default btn-block" data-toggle="modal" data-target="#tdmyModal<?php echo $td['諮詢單項目ID'];?>">檢視</button></td>
+											</tr>
+											<!-- 摘要Modal -->
+											<div id="tdmyModal<?php echo $td['諮詢單項目ID'];?>" class="modal fade" role="dialog">
+												<div class="modal-dialog modal-lg">
+												<!-- Modal content-->
+													<div class="modal-content">
+														<form class="form" method="GET" > 
+															<div class="modal-header">
+																<button type="button" class="close" data-dismiss="modal">&times;</button>
+																<h4 class="modal-title">回覆 <span style="color:#FF4500;"><?php echo $td['姓名'];?> ( <?php echo $td['學號'];?> ) </span>於 <?php echo  substr( $td['發問時間'],0,10);?> 的問題</h4>
+															</div>
+															<div class="modal-body">
+																<input type="hidden" name="advisory_id" id="advisory_id" value="<?php echo $td['諮詢單項目ID']; ?>" />
+																<div class="form-group">
+																	<label >系級與班級:</label>
+																	<input type="text" class="form-control" value='<?php echo $td['科系名稱'].'  '.$td['班級名稱'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >信箱:</label>
+																	<input type="text" class="form-control" value='<?php echo $td['電子信箱'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >電話:</label>
+																	<input type="text" class="form-control" value='<?php echo $td['行動電話'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >問題：</label>
+																	<textarea class="form-control" rows="3" readonly><?php echo $td['問題'];?></textarea>
+																</div>
+																<div class="form-group">
+																	<label >回覆：</label>
+																	<textarea class="form-control" rows="5"  name="tdcont<?php echo $td['諮詢單項目ID']; ?>" <?php if($td['回答內容']==null||$td['回答內容']==""){}else{echo "readonly";}?> ><?php if($td['回答內容']==null||$td['回答內容']==""){}else{echo $td['回答內容'];}?></textarea>
+																</div>
+																<div class="form-group">
+																	<label >追蹤狀態：</label>
+																	<label class="radio-inline"><input type="radio" name="tdtrack<?php echo $td['諮詢單項目ID']; ?>" value="1" <?php if($td['追蹤狀態']==1){echo "checked";} ?> />追蹤</label>
+																	<label class="radio-inline"><input type="radio" name="tdtrack<?php echo $td['諮詢單項目ID']; ?>" value="0" <?php if($td['追蹤狀態']==0){echo "checked";} ?> />無需追蹤</label>
+																</div>
+																<button type="button" class="btn btn-default btn-block advisoryInfShow" name="<?php echo $td['諮詢單項目ID']; ?>" onClick="getadvisory('<?php echo $td['學號']."','".$this->user->department_id ?>')" >瀏覽發問紀錄與回覆</button>
+																<button type="button" class="btn btn-default btn-block advisoryInfHide"  name="<?php echo $td['諮詢單項目ID']; ?>" style="display:none;">隱藏發問紀錄與回覆</button>
+																<br/>
+																<div class="advisoryInfDiv" name="<?php echo $td['諮詢單項目ID']; ?>" style="display:none;">
+																</div>
+																<div class="modal-footer">
+																	<button type="button" class="btn btn-primary" onClick="updateadvisory('td','<?php echo $td['諮詢單項目ID'];?>')">送出</button>
+																	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+																</div>
+															</div>
+														</form>
+													</div>
+												</div>
+											</div>
+											<!-- Modal -->
+								<?php 
+										}
+									}
+								?>	 
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane <?php if($bookmark=='all') echo 'active';?>" id="panel-all" >
+							<br/>
+							<table class="table table-hover"style="width:100%;">
+								<thead>
+									<tr class="info">
+										<th>#</th>
+										<th>諮詢時間</th>
+										<th>學號</th>
+										<th>聯絡人</th>
+										<th>摘要<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="點選摘要內容進入回覆畫面">	<i class="fa fa-info-circle" aria-hidden="true"></i></a></th>
+										<th>狀態</th>
+										<th style="text-align:center;">動作</th>
+										<th style="text-align:center;">追蹤</th>
+									</tr>
+								</thead>
+								<tbody>
+								<?php $alldatalist = $this->alldata ;
+									if($alldatalist){ 
+										$alli==0;
+										foreach($alldatalist as $alld){
+											$alli=$alli+1;
+								?>	
+											<tr class="active">
+											<td><?php echo $alli; ?></td>
+											<td><?php echo $alld['發問時間'];?></td>
+											<td><?php echo $alld['學號'];?></td>
+											<td><?php echo $alld['姓名'];?></td>
+											<td><a  data-toggle="modal" data-target="#myModal<?php echo $alld['諮詢單項目ID'];?>"><?php if (mb_strlen($alld['問題'] ,"UTF-8")>25){ echo mb_substr( $alld['問題'] , 0 , 25 ,"utf-8").'．．．'; } else {echo $alld['問題'];};?></a></td>
+											<td><?php if($alld['回答內容']==null||$alld['回答內容']==""){ ?><font style="color:#FF0000;">尚未處理</font><?php }else{ ?><font style="color:#3CB371;">已處理</font><?php }  ?></td>
+											<td><button type="button" class="btn btn-default btn-block" data-toggle="modal" data-target="#myModal<?php echo $alld['諮詢單項目ID'];?>">檢視</button></td>
+											<td style="text-align:center;"> <?php if($alld['追蹤狀態']==0){ ?><i class="fa fa-star-o"  aria-hidden="true"></i><?php }else{ ?><i class="fa fa-star" aria-hidden="true" style="color:#FFD700;"></i><?php }?></td>
+											</tr>
+											<!-- 摘要Modal -->
+											<div id="myModal<?php echo $alld['諮詢單項目ID'];?>" class="modal fade" role="dialog">
+												<div class="modal-dialog modal-lg">
+												<!-- Modal content-->
+													<div class="modal-content">
+														<form class="form" method="GET" > 
+															<div class="modal-header">
+																<button type="button" class="close" data-dismiss="modal">&times;</button>
+																<h4 class="modal-title">回覆 <span style="color:#FF4500;"><?php echo $alld['姓名'];?> ( <?php echo $alld['學號'];?> ) </span>於 <?php echo  substr( $alld['發問時間'],0,10);?> 的問題</h4>
+															</div>
+															<div class="modal-body">
+															<input type="hidden" name="advisory_id" id="advisory_id" value="<?php echo $alld['諮詢單項目ID']; ?>" />
+																<div class="form-group">
+																	<label >系級與班級:</label>
+																	<input type="text" class="form-control" value='<?php echo $alld['科系名稱'].'  '.$alld['班級名稱'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >信箱:</label>
+																	<input type="text" class="form-control" value='<?php echo $alld['電子信箱'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >電話:</label>
+																	<input type="text" class="form-control" value='<?php echo $alld['行動電話'];?>' readonly />
+																</div>
+																<div class="form-group">
+																	<label >問題：</label>
+																	<textarea class="form-control" rows="3" readonly><?php echo $alld['問題'];?></textarea>
+																</div>
+																<div class="form-group">
+																	<label >回覆：</label>
+																	<textarea class="form-control" rows="5"  name="allcont<?php echo $alld['諮詢單項目ID']; ?>" ><?php echo $alld['回答內容'];?></textarea>
+																</div>
+																<div class="form-group">
+																	<label >追蹤狀態：</label>
+																	<label class="radio-inline"><input type="radio" name="alltrack<?php echo $alld['諮詢單項目ID']; ?>" value="1" <?php if($alld['追蹤狀態']==1){echo "checked";} ?>/>追蹤</label>
+																	<label class="radio-inline"><input type="radio" name="alltrack<?php echo $alld['諮詢單項目ID']; ?>" value="0" <?php if($alld['追蹤狀態']==0){echo "checked";} ?> />無需追蹤</label>
+																</div>
+																<button type="button" class="btn btn-default btn-block advisoryInfShow" name="<?php echo $alld['諮詢單項目ID']; ?>" onClick="getadvisory('<?php echo $alld['學號']."','".$this->user->department_id ?>')" >瀏覽發問紀錄與回覆</button>
+																<button type="button" class="btn btn-default btn-block advisoryInfHide"  name="<?php echo $alld['諮詢單項目ID']; ?>" style="display:none;">隱藏發問紀錄與回覆</button>
+																<br/>
+																<div class="advisoryInfDiv" name="<?php echo $alld['諮詢單項目ID']; ?>" style="display:none;">
+																</div>
+																<div class="modal-footer">
+																	<button type="button" class="btn btn-primary" onClick="updateadvisory('all','<?php echo $alld['諮詢單項目ID'];?>')">送出</button>
+																	<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+																</div>
+															</div>
+														</form>
+													</div>
+												</div>
+											</div>
+											<!-- Modal -->
+								<?php 
+										}
+									}
+								?>	 
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 回覆成功時Modal -->
+	<div class="modal fade " id="succModal" role="dialog" >
+		<div class="modal-dialog modal-sm" >
+
+		  <!-- Modal content-->
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h4 class="modal-title">回覆完成</h4>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-default" data-dismiss="modal" onClick="history.go(0)" >關閉視窗</button>
+			</div>
+		  </div>
+		  
+		</div>
+	</div>
+	<!-- Modal -->
+	<script>
+var status="";
+$(document).ready(function(){
+	$('[data-toggle="popover"]').popover();
+	$(".advisoryInfShow").click(function(){
+		status = $(this).attr("name");
+		$(".advisoryInfDiv[name='"+status+"']").show("slow");
+		$(".advisoryInfShow[name='"+status+"']").hide();
+		$(".advisoryInfHide[name='"+status+"']").show();
+	});
+	$("#advisoryInfHide").click(function(){
+		status = $(this).attr("name");
+		$(".advisoryInfDiv[name='"+status+"']").hide("slow");
+		$(".advisoryInfHide[name='"+status+"']").hide();
+		$(".advisoryInfShow[name='"+status+"']").show();
+	});
+	$('.table').DataTable();
+});
+function getadvisory(id,dept_id){
+	charset="utf8";
+	var dovalue='getadvisory';
+	var source='admin';
+	$.ajax({
+		type: "GET",
+		url: "http://localhost/ccawww/public/power/student/studentindex",
+		dataType: "json",
+		data: {
+			'stu_id' : id,
+			'unit_id':dept_id,
+			'do':dovalue,
+			'source':source
+		},
+		success: function(data)
+		{
+			var answer_cont="";
+			$(".advisoryInfDiv[name='"+status+"']").text("");
+			for (i = 0; i < data.length; i++) { 
+				if(data[i].回答內容==""||data[i].回答內容==null){
+				}else{ 
+					answer_cont = '<div style="color:#228B22;padding-left:20px;"> 回覆內容：'
+					+data[i].回答內容+'<br/>回覆時間：'+data[i].回答時間+'</div>'
+				}
+				$(".advisoryInfDiv[name='"+status+"']").append(
+				'<div >問題內容：' + data[i].問題+'<br/>發問時間：' + data[i].發問時間 + '</div>' + answer_cont +'<hr/>');
+				answer_cont="";
+			}
+			
+		},
+		
+		error: function(xhr, ajaxOptions, thrownError)
+		{
+			alert(xhr.status);
+			alert(thrownError);
+			
+		}
+	});
+};
+function updateadvisory(source,id)
+{	
+	charset="utf8";
+	var cont= $('textarea[name='+source+'cont'+id+']').val();
+	var track= $('input[name='+source+'track'+id+']:checked').val();
+	var dovalue='updateadvisory';
+	$.ajax(
+	{
+		type: "GET",
+		url: "http://localhost/ccawww/public/power/admin/adminmessage",
+		dataType: "json",
+		data: {
+			'cont' : cont,
+			'track' : track,
+			'do':dovalue,
+			'advisory_id' : id
+		},
+		success: function(data)
+		{
+			// 成功時彈出modal，並強制點選關閉按鈕(關閉點選空白處消失視窗)
+			$("#succModal").modal({backdrop: 'static', keyboard: false});
+		},
+		error: function(xhr, ajaxOptions, thrownError)
+		{ 
+			alert(xhr.status);
+			alert(thrownError);
+		}
+	});
+};
+</script>

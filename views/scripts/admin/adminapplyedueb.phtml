@@ -1,0 +1,242 @@
+<?php 
+	$bookmark = $_GET["bookmark"];
+ ?>
+<!-- CSS file -->
+<link rel="stylesheet" href="/ccawww/public/css/easy-autocomplete.css"> 
+<!-- Additional CSS Themes file - not required-->
+<link rel="stylesheet" href="/ccawww/public/css/easy-autocomplete.themes.css"> 
+<style>
+.container{
+	width: 90%;
+}
+body{
+	font-size:16px;
+}
+.twitter-typeahead{
+	width:100%;
+}
+.easy-autocomplete{
+	width:100%;
+}
+.modal-center {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal-center:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-center .modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+.container-fluid{
+	background-color:#FFF;
+}
+
+</style>
+<div class="container-fluid">
+	<div class="col-md-12">
+		<div class="tabbable" id="tabs-520732">
+			<ul class="nav nav-tabs">
+				<li <?php if($bookmark=='general'||$bookmark==null){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminapplyedueb?bookmark=general'); ?>"><i class="fa fa-bars" aria-hidden="true"></i>　尚未審核</a>
+				</li>
+				<li <?php if($bookmark=='succ'){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminapplyedueb?bookmark=succ'); ?>"><i class="fa fa-check-circle-o"  aria-hidden="true"></i>　通過區</a>
+				</li>
+				<li <?php if($bookmark=='fail'){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminapplyedueb?bookmark=fail'); ?>"><i class="fa fa-ban" aria-hidden="true"></i>　不通過區</a>
+				</li>
+				<li <?php if($bookmark=='all'){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminapplyedueb?bookmark=all'); ?>"><i class="fa fa-undo" aria-hidden="true"></i> 檢視全部</a>
+				</li>
+			</ul>
+			<div class="tab-content">
+				<div class="tab-pane active" >
+				<br/>
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<h3 class="panel-title">
+									資料列表
+								</h3>
+							</div>
+							<div class="panel-body">
+								Panel content
+							</div>
+						</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- JS file -->
+<script src="/ccawww/public/js/jquery.easy-autocomplete.js"></script> 
+
+<script src="js/bootstrap.min.js"></script>
+<script>
+
+$(document).ready(function(){
+	$('[data-toggle="popover"]').popover();
+	$('.datatable').DataTable();
+	$("#changeImgBtn").click(function () {
+		$("#changeImgDiv").toggle("slow");
+	});
+});
+$('.stutable tbody tr').click( function() {
+    window.location = $(this).attr('href');
+}).hover( function() {
+    $(this).toggleClass('hover');
+});
+function toggleadmin(assist_id)
+{	
+	$("#admin"+assist_id).toggle('slow');
+}
+function validateForm() {
+    var x = document.forms["searchform"]["searchvalue"].value;
+    if (x == null || x == "") {
+        alert("欄位不得為空");
+        return false;
+    }
+}
+//修改證照日期
+function updatedate(assist_id)
+{	
+	var dovalue='updatedate';
+	var date=$("#date"+assist_id).val();
+	if(date==null){
+		$.ajax(
+		{
+			type: "GET",
+			url: "<?php echo $this->baseUrl('power/admin/adminadvanced'); ?>",
+			dataType: "json",
+			data: {
+				'assist_id' : assist_id,
+				'date' : date,
+				'do':dovalue
+			},
+			success: function(data)
+			{
+				location.reload();
+			},
+			error: function(xhr, ajaxOptions, thrownError)
+			{ 
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+	}else{
+		alert("您的證照發照日期尚未填寫。");
+		$("#date"+assist_id).focus();
+	}
+	
+};
+//將證照退回我的能力
+function updateback(statusvalue,assist_id)
+{	
+	var dovalue='updateback';
+	var reason='';
+	var status=true;
+	switch(statusvalue) {
+		case 4:
+			reason=$('#backreason'+assist_id).find(':selected').val();
+			if(reason=='請選擇不通過原因'||reason==''){
+				alert('請選擇不通過原因');
+				$('#backreason'+assist_id).focus();
+				status=false;	
+			}else{
+				status=true;	
+			}
+		break;
+	}
+	if (status == true) {
+		var r = confirm("已經確認過了嗎??");
+		if (r == true) {
+			$.ajax(
+			{
+				type: "GET",
+				url: "<?php echo $this->baseUrl('power/admin/adminadvanced'); ?>",
+				dataType: "json",
+				data: {
+					'assist_id' : assist_id,
+					'reason':reason,
+					'statusvalue':statusvalue,
+					'do':dovalue
+				},
+				success: function(data)
+				{
+					location.reload();
+				},
+				error: function(xhr, ajaxOptions, thrownError)
+				{ 
+					alert(xhr.status);
+					alert(thrownError);
+				}
+			});
+		}
+	}
+};
+//修改證照抵免狀態
+function updatestatus(statusvalue,assist_id)
+{	
+	var dovalue='updatestatus';
+	var reason='';
+	var status=true;
+	switch(statusvalue) {
+		case 5:
+			reason=$('#reason1'+assist_id).find(':selected').val();
+			if(reason=='請選擇再審原因'||reason==''){
+				alert('請選擇再審原因');
+				$('#reason1'+assist_id).focus();
+				status=false;	
+			}else{
+				status=true;	
+			}
+		break;
+		case 4:
+			reason=$('#reason2'+assist_id).find(':selected').val();
+			if(reason=='請選擇不通過原因'||reason==''){
+				alert('請選擇不通過原因');
+				$('#reason2'+assist_id).focus();
+				status=false;	
+			}else{
+				status=true;	
+			}
+		break;
+	}
+	if (status == true) {
+		var r = confirm("已經確認過了嗎??");
+		if (r == true) {
+			$.ajax(
+			{
+				type: "GET",
+				url: "<?php echo $this->baseUrl('power/admin/adminadvanced'); ?>",
+				dataType: "json",
+				data: {
+					'statusvalue' : statusvalue,
+					'assist_id' : assist_id,
+					'reason' : reason,
+					'do':dovalue
+				},
+				success: function(data)
+				{
+					location.reload();
+				},
+				error: function(xhr, ajaxOptions, thrownError)
+				{ 
+					alert(xhr.status);
+					alert(thrownError);
+				}
+			});
+		}
+	}
+};
+</script>

@@ -1,0 +1,694 @@
+<?php 
+	$types=$_GET['types'];
+	$bookmark = $_GET["bookmark"];
+	if($bookmark==null){$bookmark='recognition';}
+	$years = $_GET["years"];
+	if($years==null){$years=$this->years;}
+ ?>
+<style>
+.container{
+	width: 90%;
+}
+body{
+	font-size:16px;
+}
+.form-control{
+	font-size:18px;
+}
+.input-sm{
+	font-size:12px;
+}
+.panel-title{
+	padding:10px 10px 10px 10px;
+	font-size:20px;
+}
+.panel-left{
+	margin:10px 20px 10px 20px;
+}
+.panel-right{
+	margin:10px 20px 10px 20px;
+}
+.list-group-item{
+	padding:10px 30px;
+	font-size:18px;
+	height:80px;
+}
+.text-right {
+    float: right;
+}
+button .fa{
+	font-size:20px;
+	height:100%;
+}
+.container-fluid{
+	background-color:#FFF;
+}
+</style>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<br/>
+			<div class="text-right">
+				<table>
+					<tr>
+						<?php
+							if($types==$this->types_key[1]){
+						?>
+							<td>
+								　<a type="" class="btn btn-default"  href="<?php echo $this->baseUrl('power/admin/deptinfcheck') ?>" role="button"data-toggle="modal">←返回修改各學年開放狀態</a>　
+							</td>
+						<?php		
+							}
+						?>
+						<td>
+							目前編輯學年：　
+						</td>
+						<td>	
+							<select class="form-control" id="years" name="years" style="width:100px;" onChange="location = this.options[this.selectedIndex].value;">
+							<?php
+								$yearsdata = $this->yearsdata ;
+								if($yearsdata){ 
+									foreach($yearsdata as $yd){
+									?>
+										<option <?php if($yd['學年']==$years){echo 'SELECTED value="'.$yd['學年'].'"' ;}else{ echo "value='dept?types=".$types."&bookmark=".$bookmark."&years=".$yd['學年']."'"; } ?> ><?php echo $yd['學年'];?></option> 
+								<?php
+									} 
+								}
+							?>
+							</select>
+						</td>
+						<td>
+							　<button type="" class="btn btn-default"  href="#modal-container-264346" role="button"data-toggle="modal">由其他年度再製</button>
+						</td>
+					</tr>
+				</table>	
+			</div>
+			<div class="modal fade" id="modal-container-264346" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog ">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								×
+							</button>
+							<h4 class="modal-title" id="myModalLabel">
+								請選擇欲再製年度與項目
+							</h4>
+						</div>
+						<div class="modal-body">
+							<span style="color:#FF0000;">　請注意再製過後原先該年度的資料都會消失</span>
+							<br/>
+							<br/>
+							<select class="form-control" id="sel1" >
+								<option>101</option>
+								<option>102</option>
+								<option>103</option>
+								<option>104</option>
+								<option>105</option>
+							</select>
+							<br/>
+							　<label class="checkbox-inline"><input type="checkbox"  value="">目前認可之證照</label>
+							<label class="checkbox-inline"><input type="checkbox"  value="">無法以單張證照抵免資料</label>
+							<br/>
+							
+						</div>
+						<div class="modal-footer">
+
+							<button type="button" class="btn btn-default" data-dismiss="modal">
+								取消
+							</button> 
+							<button type="button" class="btn btn-primary">
+							複製
+							</button>
+						</div>
+					</div>
+				</div>	
+			</div>
+			<br/><br/>
+			<div class="tabbable" id="tabs-154656">
+				<ul class="nav nav-tabs">
+					<?php
+						$categoryarray=array(); array_push($categoryarray,'recognition');	
+					?>						
+					<li <?php if($bookmark=='recognition'||$bookmark==null){ echo 'class="active"';} ?> >
+						<a href="<?php echo $this->baseUrl('power/admin/dept?types='.$types.'&bookmark=recognition&years='.$years); ?>"><i class="fa fa-check-square-o" aria-hidden="true"></i> 目前認列之<?php if($types==$this->types_key[1]){echo $this->types_value[1];}else{echo $this->types_value[2];}?></a>
+					</li>
+					
+					<li <?php if($bookmark=='group'){ echo 'class="active"';} ?> >
+						<a href="<?php echo $this->baseUrl('power/admin/dept?types='.$types.'&bookmark=group&years='.$years); ?>"><i class="fa fa-code-fork" aria-hidden="true"></i> 無法以單張證照抵免控管</a>
+					</li>
+					<?php $datalist = $this->bookmarkdata ;
+						foreach($datalist as $d){
+							array_push($categoryarray,$d['category']);
+					?>	
+							<li <?php if($bookmark==$d['category']){ echo 'class="active"';} ?> >
+								<a href="<?php echo $this->baseUrl('power/admin/dept?types='.$types.'&bookmark='.$d['category'].'&years='.$years); ?>"><i class="fa fa-list-alt" aria-hidden="true"></i> <?php echo $d['category']; ?> </a>
+							</li>
+					<?php 
+						}
+						?>
+					<li <?php if($bookmark=='search'){ echo 'class="active"';} ?> >
+						<a href="<?php echo $this->baseUrl('power/admin/dept?types='.$types.'&bookmark=search&years='.$years); ?>"><i class="fa fa-search" aria-hidden="true"  style="color:#0066FF;"></i> 搜尋全部</a>
+					</li>
+					<li <?php if($bookmark=='apply'){ echo 'class="active"';} ?> >
+						<a href="#" data-toggle="modal" data-target="#addlicModal" ><i class="fa fa-plus" aria-hidden="true" style="color:#00AA55;"> </i> 向職涯中心申請新增證照</a>
+					</li>
+				</ul>
+				<br/>
+			</div>
+			<!-- 證照新增 Modal -->
+			<div id="addlicModal" class="modal fade" role="dialog">
+				<div class="modal-dialog modal-lg">
+				<!-- Modal content-->
+					<div class="modal-content ">
+						<form  id="commentForm" method = 'POST' enctype="multipart/form-data" >
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title"><i class="fa fa-plus" aria-hidden="true"> </i> 申請新增證照資料</h4>
+							</div>
+							<div class="modal-body">
+								<form role="form">
+									<table class="table table-bordered table-condensed table-hover">
+										<tr>
+											<td style="width:100px;">證照名稱*</td>
+											<td><input class="form-control" id="name" name="name" /></td>
+										</tr>
+										<tr>
+											<td>國內外證照*</td>
+											<td>
+											<select class="form-control" id="ctype" name="ctype">
+												<option>請選擇</option>
+												<option>國內</option>
+												<option>國外</option>
+												<option>大陸地區(含港澳)</option>
+											</select>
+										</td>
+										</tr>
+										<tr>
+											<td>級數/分數</td>
+											<td><input class="form-control" id="series" name="series"/></td>
+										</tr>
+										<tr>
+											<td>證照類別*</td>
+											<td>
+												<select class="form-control" id="category" name="category">
+													<option>請選擇</option>
+												<?php
+													foreach($datalist as $d){
+												?>
+														<option><?php echo $d['category']; ?></option>	
+														
+												<?php 
+													}
+												?>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td>證照類型*</td>
+											<td>
+												<select class="form-control" id="information" name="information">
+													<option>請選擇</option>
+													<option value='1'>資訊</option>
+													<option value='0'>專業</option>
+													<option value='2'>語言</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td>發照單位</td>
+											<td><input class="form-control" id="organization" name="organization"/></td>
+										</tr>
+										<tr>
+											<td>相當於</td>
+											<td>
+												<select class="form-control" id="equivalent" name="equivalent">
+													<option>請選擇</option>
+													<option>甲</option>
+													<option>乙</option>
+													<option>丙</option>
+												</select>
+											</td>
+										</tr>
+									</table>
+								</form>
+								<button type="button" class="btn btn-default btn-block">檢視過去申請</button>
+								<br/>
+								<table class="table table-bordered table-condensed table-striped">
+									<tr class="warning">
+										<th>申請證照資料</th>
+										<th >申請狀況</th>
+									</tr>
+									<tr>
+										<td>
+											<table class="table table-bordered table-condensed">
+												<tr>
+													<td style="width:100px;">證照名稱</td>
+													<td>TQC-OA PowerPoint(2003)</td>
+												</tr>
+												<tr>
+													<td>國內外證照</td>
+													<td>國內</td>
+												</tr>
+												<tr>
+													<td>級數/分數</td>
+													<td>丙級</td>
+												</tr>
+												<tr>
+													<td>證照類別</td>
+													<td>其他</td>
+												</tr>
+												<tr>
+													<td>證照類型</td>
+													<td>資訊</td>
+												</tr>
+												<tr>
+													<td>發照單位</td>
+													<td>(CSF)Computer Skills Foundation[中華民國電腦技能基金會]</td>
+												</tr>
+												<tr>
+													<td>相當於</td>
+													<td>甲級</td>
+												</tr>
+											</table>
+										</td>
+										<td style="width:120px;">
+											<br/><button type="button" class="btn btn-lg btn-success disabled btn-block">通過</button><br/>
+											<span>技專代碼(TCODE)：9900</span>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<table class="table table-bordered table-condensed">
+												<tr>
+													<td style="width:100px;">證照名稱</td>
+													<td>TQC-OA PowerPoint(2003)</td>
+												</tr>
+												<tr>
+													<td>國內外證照</td>
+													<td>國內</td>
+												</tr>
+												<tr>
+													<td>級數/分數</td>
+													<td>丙級</td>
+												</tr>
+												<tr>
+													<td>證照類別</td>
+													<td>其他</td>
+												</tr>
+												<tr>
+													<td>證照類型</td>
+													<td>資訊</td>
+												</tr>
+												<tr>
+													<td>發照單位</td>
+													<td>(CSF)Computer Skills Foundation[中華民國電腦技能基金會]</td>
+												</tr>
+												<tr>
+													<td>相當於</td>
+													<td>甲級</td>
+												</tr>
+											</table>
+										</td>
+										<td>
+											<br/><button type="button" class="btn btn-lg btn-danger disabled btn-block">不通過</button><br/>
+											<span>查詢不到該發照單位，請再次確認</span>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<div class="modal-footer">
+								<button type="submit" class="btn btn-primary" onclick="insertapplyedudb();">送出</button>
+								<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<!-- 證照新增 Modal結束-->
+			<div class="tab-content">
+				<div class="tab-pane <?php if(in_array($bookmark, $categoryarray)||$bookmark==null){ echo 'active'; } ?>" id="panel-noreply">
+					<table class="table table-hover datatable">
+						<thead>
+							<tr class="success">
+								<th></th>
+								<th style="width:80px;">技專代號</th>
+								<th style="width:40%">證照名稱</th>
+								<th>等級</th>
+								<th>發照單位</th>
+								<th data-orderable="false" style="width:100px;text-align:center;">通報狀態</th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php $licenseslist = $this->licensesdata ;
+							if($licenseslist){ 
+								$i==0;
+								foreach($licenseslist as $licenses){
+						?>	
+									<tr class="active">
+									<td><input type="checkbox" <?php if( $licenses['認列狀態'] == 1) { echo 'checked';} ?> onclick=" insertdeptlic(this<?php echo ",'".$types."','".$licenses['edudb_id']."','".$licenses['tcode']."','".$licenses['name']."','".$licenses['series']."'" ?>)" /></td>
+									<td><?php echo $licenses['tcode'];?></td>
+									<td><?php echo $licenses['name'];?></td>
+									<td><?php echo $licenses['series'];?></td>
+									<td><?php echo $licenses['organization'];?></td>
+									<td style="width:100px;text-align:center;"><?php if($licenses['edu_status']==1){ echo '<i class="fa fa-eye" aria-hidden="true"></i>';}else{echo '<i class="fa fa-eye-slash" aria-hidden="true"></i>';}?></td>
+						<?php 
+								}
+							}
+						?>	 
+						</tbody>
+					</table>
+				</div>
+				<div class="tab-pane <?php if($bookmark=='group') echo 'active';?>" id="panel-noreply" >
+					<br/>
+					<form  class="form-inline" style="text-align:center;">
+						<div id='search' style="padding:10px 10px 40px 10px;">
+							<span>組合式證照名稱:</span>
+							<input id='groupvalue' name='groupvalue' style="width:30%;margin:0px 10px 0px 10px;" class=' form-control' />
+							<font class="btn btn-primary" onclick='insertgroup()'>送　出</font>
+						</div>
+					</form>
+					<hr/>
+					<div class="col-md-12" style="padding:0px 80px 0px 80px;">
+					<?php $groupdata = $this->groupdata ;
+							foreach($groupdata as $group){
+					?>
+								<div class="panel-group">
+									<div class="panel panel-default">
+										<div class="panel-heading" data-toggle="collapse" href="#group<?php echo $group['群組項目ID'];?>">
+										<h4 class="panel-title">
+											<a data-toggle="collapse" href="#group<?php echo $group['群組項目ID'];?>"><?php echo $group['群組名稱'];?></a>
+											<div class="text-right">
+												<button type="button" class="btn btn-primary btn-sm "  data-toggle="modal" data-target="#updategroup" ><i class="fa fa-pencil" aria-hidden="true"></i></button>　
+												<button type="button" class="btn btn-danger btn-sm " onclick="closegroup(<?php echo $group['群組項目ID'].",'". $group['群組名稱']."'";?>)" ><i class="fa fa-trash" aria-hidden="true"></i></button>　
+												<button type="button" class="btn btn-success btn-sm "><i class="fa fa-plus" aria-hidden="true"></i></button>
+											</div>
+										</h4>
+										</div>
+										<div id="group<?php echo $group['群組項目ID'];?>" class="panel-collapse collapse">
+											<ul class="list-group">
+												<li class="list-group-item">TQC-OA WORD (2010)
+													<div class="text-right">
+														<button type="button" class="btn btn-danger btn-sm "><i class="fa fa-trash" aria-hidden="true"></i></button>
+													</div>
+												</li>
+												
+												<li class="list-group-item">TQC-OA EXCEL (2010)
+													<div class="text-right">
+														<button type="button" class="btn btn-danger btn-sm "><i class="fa fa-trash" aria-hidden="true"></i></button>
+													</div>
+												</li>
+												<li class="list-group-item">TQC-OA PowerPoint (2010)
+													<div class="text-right">
+														<button type="button" class="btn btn-danger btn-sm "><i class="fa fa-trash" aria-hidden="true"></i></button>
+													</div>
+												</li>
+											</ul>
+										</div>
+									</div>
+									<!-- 修改視窗Modal -->
+									<div class="modal fade" id="updategroup" role="dialog">
+										<div class="modal-dialog modal-sm">
+										<div class="modal-content">
+											<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal">&times;</button>
+											<h4 class="modal-title">修改<?php echo $group['群組名稱'];?>名稱</h4>
+											</div>
+											<div class="modal-body">
+											<input id='newgroupvalue<?php echo $group['群組項目ID'];?>' name='newgroupvalue<?php echo $group['群組項目ID'];?>'  placeholder="請輸入新的群組名稱" class=' form-control' value="<?php echo $group['群組名稱'];?>" />
+											</div>
+											<div class="modal-footer">
+											<font class="btn btn-primary" onclick='updategroup(<?php echo $group['群組項目ID'];?>)'>送　出</font>
+											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+											</div>
+										</div>
+										</div>
+									</div>
+								</div>	
+						<?
+							}
+						?>	 
+					</div>
+				</div>
+				<div class="tab-pane <?php if($bookmark=='search') echo 'active';?>" id="panel-noreply" >
+					<br/>
+					<form role="form" class="form-inline" method='POST' onsubmit='return IsValided(this); ' 
+		action="<?php echo $this->baseUrl('power/admin/dept?types='.$types.'&bookmark=search&years='.$years); ?>"  style="text-align:center;">
+						<div id='search' style="padding:10px 100px 40px 100px;">
+							<span>證照名稱:</span>
+							<input id='searchvalue' name='searchvalue' style="width:50%;margin:0px 10px 0px 10px;" class=' form-control' placeholder="輸入任意與證照名稱或發行單位至少三個字以上的關鍵字或其組合" value="<?php if($this->searchvalue!=null){ echo $this->searchvalue;}?>" />
+							<button type="submit" class="btn btn-primary" >搜尋</button>
+						</div>
+					</form>
+					<?php $searchlist = $this->searchdata ;
+						if($searchlist!=null){ ?>
+						<table class="table table-hover datatable">
+							<thead>
+								<tr class="success">
+									<th></th>
+									<th style="width:80px;">技專代號</th>
+									<th style="width:40%">證照名稱</th>
+									<th>等級</th>
+									<th>發照單位</th>
+									<th data-orderable="false" style="width:100px;text-align:center;">通報狀態</th>
+								</tr>
+							</thead>
+							<tbody>
+							<?php foreach($searchlist as $search){	?>	
+									<tr class="active">
+									<td><input type="checkbox" <?php if( $search['認列狀態'] =='1' ) { echo 'checked';} ?> onclick=" insertdeptlic(this<?php echo ",'".$types."','".$search['edudb_id']."','".$search['tcode']."','".$search['name']."','".$search['series']."'" ?>)" /></td>
+									<td><?php echo $search['tcode'];?></td>
+									<td><?php echo $search['name'];?></td>
+									<td><?php echo $search['series'];?></td>
+									<td><?php echo $search['organization'];?></td>
+									<td style="width:100px;text-align:center;"><?php if($search['edu_status']==1){ echo '<i class="fa fa-eye" aria-hidden="true"></i>';}else{echo '<i class="fa fa-eye-slash" aria-hidden="true"></i>';}?></td>
+							<?php 
+								}
+							?>	 
+							</tbody>
+						</table>
+					<?php } ?>
+				</div>
+			</div>
+		</div>	
+	</div>	
+</div>	
+	<!-- 修改完成時時Modal -->
+<div class="modal fade modal-center" id="succModal" role="dialog" >
+	<div class="modal-dialog modal-sm" >
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" >&times;</button>
+				<h4 class="modal-title">修改完成</h4>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+<script>	
+$(document).ready(function(){
+	$('.datatable').DataTable();
+});
+function insertgroup(){
+	var groupvalue= $("#groupvalue").val();
+	var years = $('#years').find(':selected').val();
+	var dovalue="insertgroup";
+	var types="<?php Print($types); ?>";
+	if(groupvalue==null||groupvalue==""){
+		alert("名稱請勿為空");
+	}else{
+		$.ajax({
+			type: "GET",
+			url: "http://localhost/ccawww/public/power/admin/dept",
+			dataType: "json",
+			data: {
+				'do' :dovalue,
+				'groupvalue' : groupvalue,
+				'years':years,
+				'types':types
+			},
+			success: function(data)
+			{
+				$("#succModal").modal();
+				$("#groupvalue").val("");
+			},
+			error: function(xhr, ajaxOptions, thrownError)
+			{
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+	}
+}
+function insertapplyedudb(){
+	var agreestatus=1;
+	var name= $("#name").val();
+	var ctype= $('#ctype').find(':selected').val();
+	var series= $("#series").val();
+	var category= $("#category").val();
+	var organization= $("#organization").val();
+	var equivalent= $("#equivalent").find(':selected').val();
+	var information= $("#information").find(':selected').val();
+	var informationvalue=$("#information").find(':selected').text();
+	var dovalue='insertapplyedudb';
+	if(name==""||ctype=="請選擇"||category=="請選擇"||organization==""||information=="請選擇"){
+		alert("*字號欄位不得為空");
+	}else{
+		if(series==null||series==""){
+		}else{
+			series="("+series+")"
+		}
+		if(equivalent=="請選擇"){
+			equivalent="無";
+		}
+		var agreestatus=0;
+		var r = confirm("是否要新增國內/外:　"+　ctype+"　\n類別:　"+category+"　\n發照單位:　"+organization+"　\n相當於:　"+equivalent+"級"+informationvalue+"　的　"+name+series+"　證照");
+		if (r == true) {
+			agreestatus=1;
+		}
+		if(agreestatus==1){
+			$.ajax({
+				type: "GET",
+				url: "<?php echo $this->baseUrl('power/admin/dept'); ?>",
+				dataType: "json",
+				data: {
+					'name' : name,
+					'ctype' : ctype,
+					'series' : series,
+					'category' : category,
+					'organization' : organization,
+					'information' : information,
+					'equivalent' : equivalent,
+					'do':dovalue
+				},
+				success: function(data)
+				{
+					$("#succModal").modal();
+					 location.reload();
+				},
+				
+				error: function(xhr, ajaxOptions, thrownError)
+				{
+					alert(xhr.status);
+					alert(thrownError);
+				}
+			});
+		}
+	}
+}
+function updategroup(id){
+	var newgroupvalue= $("#newgroupvalue"+id).val();
+	var dovalue="updategroup";
+	if(newgroupvalue==null||newgroupvalue==""){
+		alert("名稱請勿為空");
+	}else{
+		$.ajax({
+			type: "GET",
+			url: "<?php echo $this->baseUrl('power/admin/dept'); ?>",
+			dataType: "json",
+			data: {
+				'do' :dovalue,
+				'newgroupvalue' : newgroupvalue,
+				'id':id
+			},
+			success: function(data)
+			{
+				 location.reload();
+			},
+			error: function(xhr, ajaxOptions, thrownError)
+			{
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+	}
+}
+function closegroup(id,name){
+	var dovalue="closegroup";
+	var changestatus=0;
+	var r = confirm("是否要將"+name+"刪除?");
+		if (r == true) {
+			changestatus=1;
+		}
+	if(changestatus==1){
+		$.ajax({
+			type: "GET",
+			url: "<?php echo $this->baseUrl('power/admin/dept'); ?>",
+			dataType: "json",
+			data: {
+				'do' :dovalue,
+				'id':id
+			},
+			success: function(data)
+			{
+				 location.reload();
+			},
+			error: function(xhr, ajaxOptions, thrownError)
+			{
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+	}
+}
+function insertdeptlic(checkbox,types,edudb_id,tcode,name,series){
+	var years = $('#years').find(':selected').val();
+	// 該證照之狀態
+	var openstatus=0;
+	// 當下方問答選擇更改時changestatus則改為1
+	var changestatus=0;
+	var typesname;
+	var dovalue ='insertdeptlic';
+	if(series==null||series==''){
+	}else{
+		series="("+series+")"
+	}
+	if(types=="<?php Print($this->types_key[1]); ?>"){
+		typesname="<?php Print($this->types_value[1]); ?>";
+	}else if(types=="<?php Print($this->types_key[2]); ?>"){
+		typesname="<?php Print($this->types_value[2]); ?>";
+	}else if(types=="<?php Print($this->types_key[3]); ?>"){
+		typesname="<?php Print($this->types_value[3]); ?>";
+	}
+	if(checkbox.checked){
+		var r = confirm("是否要允許技專代號為:　"+tcode+"　的　"+name+series+"　列入您系上 "+years+" 學年 的"+typesname);
+		if (r == true) {
+			changestatus=1;
+			openstatus=1;
+		}else{
+			checkbox.checked=false;
+		}
+	}else{
+		var r = confirm("是否關閉技專代號為:　"+tcode+"　的　"+name+series+"　列入您系上 "+years+" 學年 的"+typesname);
+		if (r == true) {
+			changestatus=1;
+			openstatus=0;
+		}else{
+			checkbox.checked=true;
+		}
+	}
+	if(changestatus==1){
+		$.ajax({
+			type: "GET",
+			url: "<?php echo $this->baseUrl('power/admin/dept'); ?>",
+			dataType: "json",
+			data: {
+				'edudb_id' : edudb_id,
+				'openstatus':openstatus,
+				'types':types,
+				'years':years,
+				'do':dovalue
+			},
+			success: function(data)
+			{
+				$("#succModal").modal();
+			},
+			
+			error: function(xhr, ajaxOptions, thrownError)
+			{
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+	}
+}
+</script>

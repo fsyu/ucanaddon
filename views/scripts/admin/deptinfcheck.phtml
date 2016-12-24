@@ -1,0 +1,130 @@
+<?php 
+	$types=$_GET['types'];
+	$bookmark = $_GET["bookmark"];
+ ?>
+<style>
+.container{
+	width: 90%;
+}
+body{
+	font-size:16px;
+}
+.form-control{
+	font-size:18px;
+}
+.input-sm{
+	font-size:12px;
+}
+</style>
+    <div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="jumbotron" style="margin-top:8%;margin-left:20%;margin-right:20%;margin-bottom:10%;">
+					<form role="form" style="text-align:center;"
+					method = 'POST' enctype="multipart/form-data" onsubmit="insertdeptinf(this);">
+						<div class="form-group">
+								<p>當決定該學年度自行認列證照，該年度證照之認列需自行負責，</p>
+								<p>資訊證照之審核仍舊交由電算中心，</p>
+								<p>修改過後仍可以改回依照電算中心之認列。</p>
+							<span></span>
+						</div>
+					</form>
+					<hr/>
+					<div style="margin-right:60px;margin-left:60px;" align="center">
+						<table class="table table-hover datatable" >
+							<thead>
+								<tr class="success">
+									<th>學年度</th>
+									<th>是否自行認列<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="如若該學年度資訊證照認列仍依照電算中心之認列，請勿勾選。">	<i class="fa fa-info-circle" aria-hidden="true"></i></a></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php
+									$yearsdata = $this->yearsdata ;
+									if($yearsdata){ 
+										foreach($yearsdata as $yd){
+										?>
+										<tr>
+											<td><?php echo $yd['學年'];?></td>
+											<td><input type="checkbox" <?php if($yd['status'] == 1) { echo 'checked';} ?> onclick='insertdeptinfself(this<?php echo ",".$yd['學年'];?>)' /></td>
+										</tr>	
+									<?php
+										} 
+									}
+								?>
+							</tbody>
+						</table>
+					</div>
+					<hr/>
+					<div align="right">
+						<a class="btn btn-default" href="<?php echo $this->baseUrl('power/admin/dept?types='.$this->types_key[1]) ?>"> 進入證照管理 → </a>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>	
+	<!-- 修改完成時時Modal -->
+<div class="modal fade modal-center" id="succModal" role="dialog" >
+	<div class="modal-dialog modal-sm" >
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" >&times;</button>
+				<h4 class="modal-title">修改完成</h4>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+<script>	
+$(document).ready(function(){
+	$('[data-toggle="popover"]').popover();
+});
+function insertdeptinfself(checkbox,years){
+		// 該證照之狀態
+		var openstatus=0;
+		// 當下方問答選擇更改時changestatus則改為1
+		var changestatus=0;
+		var typesname;
+		var dovalue ='insertdeptinfself';
+		if(checkbox.checked){
+			var r = confirm(years+"學年資訊證照是否由系上自行認列");
+			if (r == true) {
+				changestatus=1;
+				openstatus=1;
+			}else{
+				checkbox.checked=false;
+			}
+		}else{
+			var r = confirm(years+"學年資訊證照是否依照電算中心之認列");
+			if (r == true) {
+				changestatus=1;
+				openstatus=0;
+			}else{
+				checkbox.checked=true;
+			}
+		}
+		if(changestatus==1){
+			$.ajax({
+				type: "GET",
+				url: "http://localhost/ccawww/public/power/admin/deptinfcheck",
+				dataType: "json",
+				data: {
+					'openstatus':openstatus,
+					'years':years,
+					'do':dovalue
+				},
+				success: function(data)
+				{
+					$("#succModal").modal();
+				},
+				
+				error: function(xhr, ajaxOptions, thrownError)
+				{
+					alert(xhr.status);
+					alert(thrownError);
+				}
+			});
+		}
+	}
+
+</script>

@@ -1,0 +1,40 @@
+﻿<?php 
+	if($this->englishdata!=null){
+		foreach($this->englishdata as $ed){
+
+			echo $ed['KSUID'];
+
+
+		}
+	}
+?>
+
+
+<div class="container">
+	<h3>學生查看英文證照</h3>
+	<a href="#" data-toggle="popover" title="Popover Header" data-content="Some content inside the popover">Toggle popover</a>
+
+	<table class="table table-hover">
+		<tr>
+			<th>tcode</th>
+			<th>證照名稱</th>
+			<th>狀態</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+
+	</table>
+
+
+</div>
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();   
+});
+</script>

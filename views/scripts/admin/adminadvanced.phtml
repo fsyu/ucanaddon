@@ -1,0 +1,661 @@
+<?php 
+	$bookmark = $_GET["bookmark"];
+	$getstuid= $_GET["getstuid"];
+	$admintype= $_GET["admintype"];
+	if($admintype==null){$admintype=$this->admintypes;}
+	$assistarray=array();
+ ?>
+<!-- CSS file -->
+<link rel="stylesheet" href="/ccawww/public/css/easy-autocomplete.css"> 
+<!-- Additional CSS Themes file - not required-->
+<link rel="stylesheet" href="/ccawww/public/css/easy-autocomplete.themes.css"> 
+<style>
+.container{
+	width: 90%;
+}
+body{
+	font-size:16px;
+}
+.twitter-typeahead{
+	width:100%;
+}
+.easy-autocomplete{
+	width:100%;
+}
+.modal-center {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal-center:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-center .modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+.container-fluid{
+	background-color:#FFF;
+}
+
+</style>
+<div class="container-fluid">
+	<div class="col-md-12">
+		<div class="tabbable" id="tabs-520732">
+			<ul class="nav nav-tabs">
+				<li <?php if($bookmark=='general'||$bookmark==null){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark=general'); ?>"><i class="fa fa-bars" aria-hidden="true"></i>　一般送審</a>
+				</li>
+				<li <?php if($bookmark=='re-examination'){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark=re-examination'); ?>"><i class="fa fa-exclamation-circle" aria-hidden="true"></i>　再審中</a>
+				</li>
+				<li <?php if($bookmark=='fail'){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark=fail'); ?>"><i class="fa fa-ban" aria-hidden="true"></i>　不通過</a>
+				</li>
+				<li <?php if($bookmark=='backtoapply'){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark=backtoapply'); ?>"><i class="fa fa-undo" aria-hidden="true"></i>　返回申請</a>
+				</li>
+				<li <?php if($bookmark=='search'){ echo 'class="active"';} ?> >
+					<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark=search'); ?>"><i class="fa fa-search" aria-hidden="true"  style="color:#0066FF;"></i>　搜尋</a>
+				</li>
+			</ul>
+			<div class="tab-content">
+				<div class="tab-pane active" >
+					<br/>
+				<?php if($bookmark=='search'){?>
+					<form id='searchform' role="form" class="form-inline" method='GET' onsubmit="return validateForm()"
+				action="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark='.$bookmark); ?>"  style="text-align:center;">
+						<div id='search1' style="padding:20px 100px 40px 100px;">
+							<span style="font-size:20px;">請輸入同學之資料:</span>
+							<input id='searchvalue' name='searchvalue' style="width:30%;margin:0px 10px 0px 10px;font-size:20px;" class=' form-control' placeholder="學號/KSUID/姓名/班級" value="<?php if($this->searchvalue!=null){ echo $this->searchvalue;}?>" />
+							<input id='bookmark' name='bookmark' type="hidden" value="<?php echo $bookmark;?>" />
+							<button type="submit" class="btn btn-primary" >搜尋</button>
+						</div>
+					</form>
+					<hr/>
+				<?php }?>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								資料列表
+							</h3>
+						</div>
+						<div class="panel-body">
+							<?php if($this->studata!=null){ ?>
+							<div class="col-md-12">
+								<table class="table table-condensed table-hover datatable stutable">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>部別</th>
+											<th>系所</th>
+											<th>班級</th>
+											<th>KSUID</th>
+											<th>學號</th>
+											<th>姓名</th>
+										<!--	
+											<th>英文姓名</th>
+											<th>信箱</th>
+										-->
+											<?php if($bookmark=='backtoapply'){ ?><th>申請證照</th><?php } ?>
+										</tr>
+									</thead>
+									<tbody>
+									<?php 
+											$i==0;
+											foreach($this->studata as $studata){
+												$i=$i+1;
+									?>	<?php if($this->searchvalue!=null){$sv="&searchvalue=".$this->searchvalue;} ?>
+										<tr class="<?php if($getstuid==$studata['stuid']){echo active;}?>" href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark='. $bookmark.'&getstuid='. $studata['stuid'].$sv); ?>" >
+											<td><?php echo $i; ?></td>
+											<td><?php echo $studata['學部名稱'];?></td>
+											<td><?php echo $studata['科系名稱'];?></td>
+											<td><?php echo $studata['班級名稱'];?></td>
+											<td><?php echo $studata['ksuid'];?></td>
+											<td><?php echo $studata['stuid'];?></td>
+											<td><?php echo $studata['u_name'];?></td>
+										<!--	
+											<td><?php echo $studata['英文姓名'];?></td>
+											<td><?php echo $studata['電子信箱'];?></td>
+										-->
+											<?php if($bookmark=='backtoapply'){ ?><td><?php echo $studata['cername']; array_push($assistarray,$studata['assist_id']);?></td><?php } ?>
+										</tr>
+									<?php } ?>
+									</tbody>
+								</table>
+							</div>
+						<?php }else{echo '暫無資料';} ?>
+						</div>
+					</div>
+				</div>
+				<?php if($getstuid!=null){?>
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<?php echo $this->stuser->name."(".$this->stuser->stuid.")";?> 的學生資料
+						</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-condensed ">
+							<thead>
+								<tr>
+									<th>部別</th>
+									<th>系所</th>
+									<th>班級</th>
+									<th>KSUID</th>
+									<th>學號</th>
+									<th>姓名</th>
+									<th>英文姓名</th>
+									<th>信箱</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr >
+									<td><?php echo $this->stuser->school?></td>
+									<td><?php echo $this->stuser->department;?></td>
+									<td><?php echo $this->stuser->class;?></td>
+									<td><?php echo $this->stuser->user_id?></td>
+									<td><?php echo $this->stuser->stuid;?></td>
+									<td><?php echo $this->stuser->name;?></td>
+									<td><?php echo $this->stuser->enname;?></td>
+									<td><?php echo $this->stuser->email;?></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<?php echo $this->stuser->name."(".$this->stuser->stuid.")";?> 的證照資料
+						</h3>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-12">
+								<br/>
+								<div class="tabbable" id="tabs-299909">
+									<ul class="nav nav-tabs"> 
+										<li <?php if($admintype==$this->types_key[1]){ echo 'class="active"' ;} ?> >
+											<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark='.$bookmark.'&getstuid='.$getstuid.'&admintype='.$this->types_key[1]); ?>" >資訊證照</a>
+										</li>
+										<li <?php if($admintype==$this->types_key[2]){ echo 'class="active"' ;} ?>>
+											<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark='.$bookmark.'&getstuid='.$getstuid.'&admintype='.$this->types_key[2]); ?>" >專業證照</a>
+										</li>
+										<li <?php if($admintype==$this->types_key[3]){ echo 'class="active"' ;} ?>>
+											<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark='.$bookmark.'&getstuid='.$getstuid.'&admintype='.$this->types_key[3]); ?>" >英文證照</a>
+										</li>
+										<li <?php if($admintype==0){ echo 'class="active"' ;}?>>
+											<a href="<?php echo $this->baseUrl('power/admin/adminadvanced?bookmark='.$bookmark.'&getstuid='.$getstuid.'&admintype=0'); ?>" >我的能力</a>
+										</li>
+									</ul>
+									<div class="tab-content">
+										<div class="tab-pane active" id="panel-1">
+											<table class="table table-hover">
+												<thead>
+													<tr>
+														<th>#</th>
+														<th>認證日期</th>
+														<th>通報日期</th>
+														<th>類型</th>
+														<th>技專代號</th>
+														<th>級別</th>
+														<th>
+															<span>證照名稱</span>
+															<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="證照掃描後，可點選證照名稱瀏覽證照">
+																<i class="fa fa-info-circle" aria-hidden="true"></i>
+															</a>
+														</th>
+														<th>
+															<span>狀態</span>
+															<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="抵免中(尚未經過註冊組同意之證照)，尚可更改，當證照狀態為通過時則定案無法修改">
+																<i class="fa fa-info-circle" aria-hidden="true"></i>
+															</a>
+														</th>
+														<th>動作</th>
+														<th>紀錄</th>
+													</tr>
+												</thead>
+												<tbody>
+													<?php $assistlist = $this->assistdata ;
+															if($assistlist){ 
+																$i1==0;
+																foreach($assistlist as $assist){
+																	$i1=$i1+1;
+													?>	
+																	<tr >
+																		<td><?php echo $i1; ?></td>
+																		<td><?php echo substr( $assist['issue'] , 0 , 10 );?></td>
+																		<td><?php echo substr( $assist['created'] , 0 , 10 );?></td>
+																		<td>
+																		<?php $num=0;?>
+																		<?php if($assist['資訊狀態']==1){ 
+																				$num=$num+1;
+																		?>
+																				<button type="button" class="btn  btn-primary disabled">資</button>
+																		<?php }?>
+																		<?php if($assist['專業狀態']==1){ 
+																				$num=$num+1;
+																		?>
+																			<button type="button" class="btn  btn-success disabled">專</button>
+																		<?php }?>
+																		<?php if($assist['英文狀態']==1){
+																				$num=$num+1;
+																		?>
+																			<button type="button" class="btn  btn-warning disabled">英</button>
+																		<?php }?>
+																		<?php if($num==0){ ?>
+																			<button type="button" class="btn  disabled">無</button>
+																		<?php }?>
+																		</td>
+																		<td><?php echo $assist['tcode'];?></td>
+																		<td><?php echo $assist['series'];?></td>
+																		<td><?php if($assist['圖片狀態']!=0){ ?>
+																			<a type="button"  data-toggle="modal" data-target="#img<?php echo $assist['assist_id']?>"><?php echo $assist['cername'];?></a>
+																			<!-- 資訊證照圖片 Modal -->
+																			<div id="img<?php echo $assist['assist_id']?>" class="modal fade" role="dialog">
+																				<div class="modal-dialog modal-lg">
+																					<!-- Modal content-->
+																					<div class="modal-content">
+																					<div class="modal-header">
+																						<button type="button" class="close" data-dismiss="modal">&times;</button>
+																						<h4 class="modal-title">證照圖片</h4>
+																					</div>
+																					<div class="modal-body">
+																						<img alt="<?php echo $this->stuser->stuid.'-'.$assist['tcode'].'.jpg';?>" src="<?php echo $this->licenses_url.$this->stuser->stuid.'-'.$assist['tcode'].'.jpg';?>" style="width:100%;" />
+																					</div>
+																					<div class="modal-footer">
+																						<button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+																					</div>
+																					</div>
+																				</div>
+																			</div>
+																			<!-- Modal -->
+																		<?php }else{ echo $assist['cername']; }?></td>
+																		<td>
+																			<?php switch ($assist['s_name']) {
+																					case '通過':
+																			?>
+																				<button type="button" class="btn btn-xs btn-success disabled"><?php echo $assist['s_name'];?></button>
+																			<?php			
+																					break;
+																					case '抵免中':
+																			?>
+																				<button type="button" class="btn btn-xs btn-success disabled"><?php echo $assist['s_name'];?></button>
+																			<?php
+																					break;
+																					case '再審中':
+																			?>
+																				<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="<?php echo $assist['comment'];?>"><?php echo $assist['s_name'];?></a>
+																			<?php		
+																					break;
+																					case '不通過':
+																			?>
+																				<a href="#" title="提示" data-toggle="popover" data-trigger="hover" data-content="<?php echo $assist['comment'];?>"><?php echo $assist['s_name'];?></a>
+																			<?php			
+																					break;
+																					case '己建檔':
+																						if($assist['圖片狀態']==0){echo '待掃描';}else{echo '待送審';}
+																					break;
+																					case '申請中':
+																						if($assist['圖片狀態']==0){echo '待掃描';}else{echo '待送審';}
+																					break;
+																					default:
+																						echo $assist['s_name'];
+																					break;
+																				}
+																			?>
+																		</td>
+																		<td>
+																			<?php 
+																			if($this->admintypes==$admintype){
+																				$adminstatus[$assist['assist_id']]=0;
+																				if($bookmark!='backtoapply'){
+																					switch ($assist['status']) {
+																						//取出證照狀態
+																						case '2':
+																							$adminstatus[$assist['assist_id']]=1;
+																				?>
+																							<button type="button" class="btn btn-block btn-primary"  onClick="toggleadmin(<?php echo "'".$assist['assist_id']."'";?>)" >審核</button>
+																				<?php
+																						break;
+																						case '7':
+																				?>
+																				<?php		
+																						break;
+																						default:
+																							$adminstatus[$assist['assist_id']]=1;
+																				?>
+																							<button type="button" class="btn btn-block btn-warning" onClick="toggleadmin(<?php echo "'".$assist['assist_id']."'";?>)">狀態修改</button>
+																				<?php		
+																						break;
+																					}
+																				}else{
+																					if(in_array($assist['assist_id'], $assistarray)){
+																						$adminstatus[$assist['assist_id']]=1;
+																				?>
+																							<button type="button" class="btn btn-block btn-warning" onClick="toggleadmin(<?php echo "'".$assist['assist_id']."'";?>)">返回審核</button>
+																				<?php
+																					}
+																				}
+																			}
+																			?>
+																		</td>
+																		<td ><i class="fa fa-eye" aria-hidden="true"></i></td>
+																	</tr>
+																	<?php if($adminstatus[$assist['assist_id']]==1){ ?>
+																	<tr id="admin<?php echo $assist['assist_id']?>" style="display:none;">
+																		<td colspan="9"   >
+																		<!--第一張證照之內容-->
+																			<div class="col-md-12 popupDiv" id="popupDiv1">
+																				<div class="row">
+																					<div role="form" class="form-inline" style="line-height: 35px;letter-spacing: 3px;font-size:15px;">
+																						<div class="col-md-4">
+																							<div class="tabbable" id="tabs-515630">
+																								<ul class="nav nav-tabs">
+																									<li class="active">
+																										<a href="#panel-admin<?php echo $assist['assist_id']?>" data-toggle="tab"><i class="fa fa-check-square-o" aria-hidden="true"></i> 審核功能</a>
+																									</li>
+																									<li>
+																										<a href="#panel-update<?php echo $assist['assist_id']?>" data-toggle="tab"><i class="fa fa-calendar" aria-hidden="true"></i> 修改日期</a>
+																									</li>
+																									<li>
+																										<a href="#panel-updateimg<?php echo $assist['assist_id']?>" data-toggle="tab"><i class="fa fa-picture-o" aria-hidden="true"></i> 修改圖片</a>
+																									</li>
+																								</ul>
+																								<div class="tab-content">
+																									<div class="tab-pane active" id="panel-admin<?php echo $assist['assist_id']?>">
+																										<br/>
+																										<ul>
+																											<?php if((strtotime(substr( $assist['created'] , 0 , 10 )) - strtotime(substr( $assist['issue'] , 0 , 10 )))/ (60*60*24)>185){ ?>
+																												<li><span style="color:red;">已超過六個期限</span></li>
+																											<?php
+																												 }
+																											if(in_array($assist['assist_id'], $assistarray)){
+																											 ?>
+																											<li>
+																												<span>退回我的能力區</span><button type="button" class="btn btn-default" onClick="updateback(7,<?php echo $assist['assist_id']?>)">允許退回</button>
+																											</li>
+																											<li>
+																												<span>審查結果不通過時請選擇原因</span>
+																												<select class="form-control" id="backreason<?php echo $assist['assist_id']?>">
+																													<option value="">請選擇不通過原因</option>
+																													<option value="該證照與通過證照為組合，故無法退回">該證照與通過證照為組合，故無法退回</option>
+																													<option value="其他">其他</option>
+																												</select>
+																												<span> 並按下</span><button type="button" class="btn btn-danger" onClick="updateback(4,<?php echo $assist['assist_id']?>)">不通過</button>
+																											</li>
+																											<?php }else{ ?>
+																											<li>
+																												<span>已同意通過，逕送註冊組時，按下</span><button type="button" class="btn btn-success " onClick="updatestatus(3,<?php echo $assist['assist_id']?>)">抵免</button>
+																											</li>
+																											<li>
+																												<span>當多筆證照出現不通過與通過同時出現時，但決策是通過時按下</span><button type="button" class="btn btn-info" onClick="updatestatus(8,<?php echo $assist['assist_id']?>)">登入完成</button>
+																											</li>
+																											<li>
+																												<span>當有疑慮時請選擇原因</span>
+																												<select class="form-control" id="reason1<?php echo $assist['assist_id']?>">
+																													<option>請選擇再審原因</option>
+																													<option>證照缺件</option>
+																													<option>該張證照圖檔有誤</option>
+																													<option>該張證照無法以單張通過</option>
+																													<option>超過通報期限</option>
+																												</select>
+																												<span> 並按下</span><button type="button" class="btn btn-warning" onClick="updatestatus(5,<?php echo $assist['assist_id']?>)">再審中</button>
+																											</li>
+																											<li>
+																												<span>審查結果不通過時請選擇原因</span>
+																												<select class="form-control" id="reason2<?php echo $assist['assist_id']?>">
+																													<option value="">請選擇不通過原因</option>
+																													<option value="102年起入學學生，需在學期間取得資訊證照">102年起入學學生，需在學期間取得資訊證照</option>
+																													<option value="未達系級標準">未達系級標準</option>
+																													<option value="未符合校級法規">未符合校級法規</option>
+																													<option value="超過入學前兩年內時限">超過入學前兩年內時限</option>
+																													<option value="非入學後取得之證照">非入學後取得之證照</option>
+																													<option value="非中心承認之證照">非中心承認之證照</option>
+																													<option value="非職涯承認之證照">非職涯承認之證照</option>
+																												</select>
+																												<span> 並按下</span><button type="button" class="btn btn-danger" onClick="updatestatus(4,<?php echo $assist['assist_id']?>)">不通過</button>
+																											</li>
+																											<li>
+																												<span>本人同意刪除時，按下</span><button type="button" class="btn btn-default" onClick="updatestatus(9,<?php echo $assist['assist_id']?>)">作廢</button>
+																											</li>
+																											<?php } ?>
+																										</ul>	
+																									</div>
+																									<div class="tab-pane" id="panel-update<?php echo $assist['assist_id']?>">
+																										<br/><br/>
+																										<ul>
+																											<li>
+																												<span>請輸入正確西元年日期</span>
+																												<input type="date" class="form-control" id="date<?php echo $assist['assist_id']?>"/>
+																												<button type="button" class="btn btn-default" onClick="updatedate(<?php echo $assist['assist_id']?>)">修改</button>
+																											</li>
+																										</ul>
+																									</div>
+																									<div class="tab-pane" id="panel-updateimg<?php echo $assist['assist_id']?>">
+																										<br/>
+																										<ul>
+																											<li>
+																												<form role="form" class="form-inline" action ="<?php echo $this->baseUrl('power/admin/adminadvanced?do=updateimg'); ?>" method = 'POST' enctype="multipart/form-data">
+																													<div id="changeImgDiv" >
+																														<i class="fa fa-picture-o" aria-hidden="true"></i> <span>證照掃描檔上傳</span>
+																														<input type="file" id="licensesimg" name="licensesimg" />
+																														<p class="help-block">
+																														<i class="fa fa-lightbulb-o" aria-hidden="true"></i> 
+																														<span>請確定上傳證照與該證照資料是否相同</span>
+																														<input type="hidden" id="tcode" name="tcode" value="<?php echo $assist['tcode'];?>"/>
+																														<input type="hidden" id="stuid" name="stuid" value="<?php echo $this->stuser->stuid;?>"/>
+																														<input type="hidden" id="bookmark" name="bookmark" value="<?php echo $bookmark;?>"/>
+																														<br/>
+																														<button type="submit" class="btn btn-primary" >送出</button>	
+																													</div>  
+																												</form>
+																											</li>
+																										</ul>	
+																									</div>
+																								</div>
+																							</div>	 
+																						</div>
+																						<div class="col-md-8" style="text-align:center;padding-left:40px;">
+																							<br/>
+																							<img alt="<?php echo $this->stuser->stuid.'-'.$assist['tcode'].'.jpg';?>" src="<?php echo $this->licenses_url.$this->stuser->stuid.'-'.$assist['tcode'].'.jpg';?>" style="width:90%;" />
+																						</div>
+																					</div>
+																				</div>
+																			</div>
+																			<!--證照之內容結束-->
+																		</td>
+																	</tr>
+													<?php 
+																	}
+																}
+															}
+													?>	 
+														
+												</tbody>
+											</table>
+											
+										</div>
+										
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php } ?>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- JS file -->
+<script src="/ccawww/public/js/jquery.easy-autocomplete.js"></script> 
+
+<script src="js/bootstrap.min.js"></script>
+<script>
+
+$(document).ready(function(){
+	$('[data-toggle="popover"]').popover();
+	$('.datatable').DataTable();
+	$("#changeImgBtn").click(function () {
+		$("#changeImgDiv").toggle("slow");
+	});
+});
+$('.stutable tbody tr').click( function() {
+    window.location = $(this).attr('href');
+}).hover( function() {
+    $(this).toggleClass('hover');
+});
+function toggleadmin(assist_id)
+{	
+	$("#admin"+assist_id).toggle('slow');
+}
+function validateForm() {
+    var x = document.forms["searchform"]["searchvalue"].value;
+    if (x == null || x == "") {
+        alert("欄位不得為空");
+        return false;
+    }
+}
+//修改證照日期
+function updatedate(assist_id)
+{	
+	var dovalue='updatedate';
+	var date=$("#date"+assist_id).val();
+	if(date==null){
+		$.ajax(
+		{
+			type: "GET",
+			url: "<?php echo $this->baseUrl('power/admin/adminadvanced'); ?>",
+			dataType: "json",
+			data: {
+				'assist_id' : assist_id,
+				'date' : date,
+				'do':dovalue
+			},
+			success: function(data)
+			{
+				location.reload();
+			},
+			error: function(xhr, ajaxOptions, thrownError)
+			{ 
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+	}else{
+		alert("您的證照發照日期尚未填寫。");
+		$("#date"+assist_id).focus();
+	}
+	
+};
+//將證照退回我的能力
+function updateback(statusvalue,assist_id)
+{	
+	var dovalue='updateback';
+	var reason='';
+	var status=true;
+	switch(statusvalue) {
+		case 4:
+			reason=$('#backreason'+assist_id).find(':selected').val();
+			if(reason=='請選擇不通過原因'||reason==''){
+				alert('請選擇不通過原因');
+				$('#backreason'+assist_id).focus();
+				status=false;	
+			}else{
+				status=true;	
+			}
+		break;
+	}
+	if (status == true) {
+		var r = confirm("已經確認過了嗎??");
+		if (r == true) {
+			$.ajax(
+			{
+				type: "GET",
+				url: "<?php echo $this->baseUrl('power/admin/adminadvanced'); ?>",
+				dataType: "json",
+				data: {
+					'assist_id' : assist_id,
+					'reason':reason,
+					'statusvalue':statusvalue,
+					'do':dovalue
+				},
+				success: function(data)
+				{
+					location.reload();
+				},
+				error: function(xhr, ajaxOptions, thrownError)
+				{ 
+					alert(xhr.status);
+					alert(thrownError);
+				}
+			});
+		}
+	}
+};
+//修改證照抵免狀態
+function updatestatus(statusvalue,assist_id)
+{	
+	var dovalue='updatestatus';
+	var reason='';
+	var status=true;
+	switch(statusvalue) {
+		case 5:
+			reason=$('#reason1'+assist_id).find(':selected').val();
+			if(reason=='請選擇再審原因'||reason==''){
+				alert('請選擇再審原因');
+				$('#reason1'+assist_id).focus();
+				status=false;	
+			}else{
+				status=true;	
+			}
+		break;
+		case 4:
+			reason=$('#reason2'+assist_id).find(':selected').val();
+			if(reason=='請選擇不通過原因'||reason==''){
+				alert('請選擇不通過原因');
+				$('#reason2'+assist_id).focus();
+				status=false;	
+			}else{
+				status=true;	
+			}
+		break;
+	}
+	if (status == true) {
+		var r = confirm("已經確認過了嗎??");
+		if (r == true) {
+			$.ajax(
+			{
+				type: "GET",
+				url: "<?php echo $this->baseUrl('power/admin/adminadvanced'); ?>",
+				dataType: "json",
+				data: {
+					'statusvalue' : statusvalue,
+					'assist_id' : assist_id,
+					'reason' : reason,
+					'do':dovalue
+				},
+				success: function(data)
+				{
+					location.reload();
+				},
+				error: function(xhr, ajaxOptions, thrownError)
+				{ 
+					alert(xhr.status);
+					alert(thrownError);
+				}
+			});
+		}
+	}
+};
+</script>
